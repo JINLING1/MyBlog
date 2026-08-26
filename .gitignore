@@ -2,6 +2,7 @@ node_modules/
 .pnpm-store/
 docs/.vitepress/cache/
 docs/.vitepress/dist/
+docs/dev-dist/
 .env
 .env.local
 .DS_Store

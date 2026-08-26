@@ -32,17 +32,17 @@ export default withPwa(
       hostname: canonicalOrigin
     },
     head: [
-      ['link', { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],
-      ['link', { rel: 'alternate icon', href: '/favicon-32x32.png', type: 'image/png' }],
+      ['link', { rel: 'icon', href: '/favicon-32x32.png', type: 'image/png' }],
       ['link', { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }],
-      ['meta', { name: 'theme-color', content: '#0B1530' }],
+      ['meta', { name: 'theme-color', content: '#F7F8FC', media: '(prefers-color-scheme: light)' }],
+      ['meta', { name: 'theme-color', content: '#101218', media: '(prefers-color-scheme: dark)' }],
       ['meta', { name: 'author', content: 'JinLing' }],
       ['meta', { name: 'robots', content: 'index, follow' }],
       ['meta', { property: 'og:type', content: 'website' }],
       ['meta', { property: 'og:site_name', content: 'JinLingBlog' }],
-      ['meta', { property: 'og:image', content: `${canonicalOrigin}/og.svg` }],
+      ['meta', { property: 'og:image', content: `${canonicalOrigin}/og.png` }],
       ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
-      ['meta', { name: 'twitter:image', content: `${canonicalOrigin}/og.svg` }]
+      ['meta', { name: 'twitter:image', content: `${canonicalOrigin}/og.png` }]
     ],
     transformHead({ pageData }) {
       const title = pageData.title ? `${pageData.title} · JinLingBlog` : 'JinLingBlog'
@@ -60,9 +60,9 @@ export default withPwa(
     },
     themeConfig: {
       logo: {
-        light: '/logo-mark.svg',
-        dark: '/logo-mark.svg',
-        alt: 'JINLING'
+        light: '/logo-mark-light.png',
+        dark: '/logo-mark-dark.png',
+        alt: 'JinLingBlog'
       },
       siteTitle: 'JinLingBlog',
       nav: [
@@ -150,20 +150,20 @@ export default withPwa(
     pwa: {
       registerType: 'autoUpdate',
       includeAssets: [
-        'favicon.svg',
         'favicon-32x32.png',
         'apple-touch-icon.png',
-        'logo-mark.svg',
-        'logo-horizontal.svg',
-        'og.svg'
+        'logo-mark-light.png',
+        'logo-mark-dark.png',
+        'jlg-logo-master.png',
+        'og.png'
       ],
       manifest: {
         name: 'JinLingBlog',
         short_name: 'JinLing',
         description: 'Code. Log. Share. 记录、整理与分享技术知识。',
         lang: 'zh-CN',
-        theme_color: '#0B1530',
-        background_color: '#07101F',
+        theme_color: '#5B5BD6',
+        background_color: '#101218',
         display: 'standalone',
         start_url: '/',
         scope: '/',

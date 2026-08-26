@@ -74,9 +74,10 @@ GITHUB_REPOSITORY=<owner>/JinLingBlog
 
 ## 品牌资源
 
-- `docs/public/logo-mark.svg`：方形 JL 技术标志
-- `docs/public/logo-horizontal.svg`：JINLING 横向字标
-- `docs/public/og.svg`：社交分享图
+- `docs/public/jlg-logo-master.png`：清晰化后的透明 JLG 主标志
+- `docs/public/logo-mark-light.png`：亮色模式靛紫标志
+- `docs/public/logo-mark-dark.png`：暗色模式淡紫标志
+- `docs/public/og.png`：社交分享图
 - `scripts/generate-icons.mjs`：生成 favicon 与 PWA PNG 图标
 
 所有品牌资源均为仓库内的代码原生 SVG，不依赖外部字体或图片服务。

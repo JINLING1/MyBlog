@@ -1,12 +1,16 @@
 import DefaultTheme from 'vitepress/theme'
 import type { Theme } from 'vitepress'
+import { defineClientComponent } from 'vitepress'
 import { h } from 'vue'
 import HomeCategories from './components/HomeCategories.vue'
 import BrandWordmark from './components/BrandWordmark.vue'
 import ArticleMeta from './components/ArticleMeta.vue'
 import GiscusComments from './components/GiscusComments.vue'
-import PwaUpdateToast from './components/PwaUpdateToast.vue'
 import './styles.css'
+
+const PwaUpdateToast = defineClientComponent(
+  () => import('./components/PwaUpdateToast.vue')
+)
 
 export default {
   extends: DefaultTheme,

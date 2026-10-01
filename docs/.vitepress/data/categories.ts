@@ -21,7 +21,7 @@ export const categories: BlogCategory[] = [
     description: '从语义化结构到现代布局，构建可靠、易维护的界面。',
     icon: '</>',
     accent: '#38bdf8',
-    articles: [{ text: '语义化 HTML：让结构表达含义', link: '/html-css/semantic-html' }]
+    articles: [{ text: 'HTML 高频考点', link: '/html-css/html' }]
   },
   {
     slug: 'javascript',

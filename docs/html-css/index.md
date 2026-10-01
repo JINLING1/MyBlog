@@ -6,15 +6,10 @@ comments: false
 
 # HTML & CSS
 
-HTML 决定内容的结构与语义，CSS 决定它如何呈现。这个栏目关注的不只是“实现效果”，还包括可访问性、响应式设计和长期维护成本。
+HTML 决定内容的结构与语义，CSS 决定它如何呈现。这个栏目给出真实求职中最高频的考点
 
 ## 从这里开始
 
-- [语义化 HTML：让结构表达含义](/html-css/semantic-html)
+- [HTML高频考点](/html-css/html)
 
-## 计划整理
-
-- CSS 层叠、继承与优先级
-- Flexbox 与 Grid 的选择边界
-- 响应式布局和容器查询
-- Web 可访问性基础
+- [CSS高频考点](/html-css/css)

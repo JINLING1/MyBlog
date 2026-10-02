@@ -319,7 +319,7 @@ objToNumber({}) === NaN
  false + true // 1
 ```
 
-2. <code>**-**</code>**、**<code>*****</code>**、**<code>****</code>**操作符**`NaN`也是一个数字
+2. <code>**-**</code>**、**<code>*****</code>**、**<code>**/**</code>**操作符**`NaN`也是一个数字
 
 ```javascript
 1 * '23' // 23

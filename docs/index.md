@@ -11,7 +11,7 @@ hero:
   actions:
     - theme: brand
       text: 开始阅读
-      link: /javascript/
+      link: /html-css/
     - theme: alt
       text: 浏览分类
       link: /#categories

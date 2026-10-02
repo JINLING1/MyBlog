@@ -24,4 +24,4 @@ comments: false
 
 ## 技术架构
 
-本站使用 VitePress 和 Markdown 构建，通过 Cloudflare Pages 发布，并使用浏览器本地索引完成全文搜索。核心页面是纯静态资源，不依赖数据库和长期运行的服务器。
+本站使用 VitePress 和 Markdown 构建，通过 Cloudflare Pages 发布，并使用浏览器本地索引完成全文搜索。

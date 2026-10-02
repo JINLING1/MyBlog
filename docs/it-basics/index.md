@@ -1,6 +1,6 @@
 ---
 title: IT 基础
-description: 补齐网络、系统、Git 与计算机基础知识。
+description: 计算机网络、操作系统、Git 与计算机基础知识。
 comments: false
 ---
 

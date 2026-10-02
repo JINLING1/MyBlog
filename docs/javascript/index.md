@@ -10,7 +10,7 @@ comments: false
 
 ## 从这里开始
 
-- [闭包：从词法作用域开始理解](/javascript/closure)
+- [JavaScript](/javascript/js)
 
 ## 计划整理
 

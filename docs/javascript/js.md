@@ -280,13 +280,13 @@ ToPrimitive(obj,type)
 
 `type`的值为`number`或者`string`。
 
-**（1）当**<code>**type**</code>**为**<code>**number**</code>**时规则如下：**
+**（1）当 `type` 为 `number` 时规则如下：**
 
 * 调用`obj`的`valueOf`方法，如果为原始值，则返回，否则下一步；
 * 调用`obj`的`toString`方法，后续同上；
 * 抛出`TypeError` 异常。
 
-**（2）当**<code>**type**</code>**为**<code>**string**</code>**时规则如下：**
+**（2）当**type`**为**`string`**时规则如下：**
 
 * 调用`obj`的`toString`方法，如果为原始值，则返回，否则下一步；
 * 调用`obj`的`valueOf`方法，后续同上；
@@ -309,7 +309,7 @@ objToNumber({}) === NaN
 
 以下是基本类型的值在不同操作符的情况下隐式转换的规则 （对于对象，其会被`ToPrimitive`转换成基本类型，所以最终还是要应用基本类型转换规则）：
 
-1. <code>**+**</code>**操作符**`+`操作符的两边有至少一个`string`类型变量时，两边的变量都会被隐式转换为字符串；其他情况下两边的变量都会被转换为数字。
+1. **`+`**操作符:  `+`操作符的两边有至少一个`string`类型变量时，两边的变量都会被隐式转换为字符串；其他情况下两边的变量都会被转换为数字。
 
 ```javascript
 1 + '23' // '123'
@@ -319,7 +319,7 @@ objToNumber({}) === NaN
  false + true // 1
 ```
 
-2. <code>**-**</code>**、**<code>*****</code>**、**<code>**/**</code>**操作符**`NaN`也是一个数字
+2. `-`**、**`*`**、**`/`**操作符**`NaN`也是一个数字
 
 ```javascript
 1 * '23' // 23
@@ -327,7 +327,7 @@ objToNumber({}) === NaN
  1 / 'aa' // NaN
 ```
 
-3. **对于**<code>**==**</code>**操作符**
+3. 对于**`==`**操作符
 
 操作符两边的值都尽量转成`number`：
 
@@ -337,7 +337,7 @@ objToNumber({}) === NaN
 '0' == 0 // '0'转为number为0
 ```
 
-4. **对于**<code>**<**</code>**和**<code>**>**</code>**比较符**
+4. **对于**`<`**和**`>`**比较符**
 
 如果两边都是字符串，则比较字母表顺序：
 
@@ -1398,7 +1398,7 @@ for (let i = 1; i <= 5; i++) {
 
 当一个函数被调用时，就会为该函数创建一个新的执行上下文，函数的上下文可以有任意多个。
 
-**（3）**<code>**eval**</code>**函数执行上下文**
+**（3）**`eval`**函数执行上下文**
 
 执行在eval函数中的代码会有属于他自己的执行上下文，不过eval函数不常使用，不做介绍。
 
@@ -1719,7 +1719,7 @@ const promise = new Promise(function(resolve, reject) {
 });
 ```
 
-**一般情况下都会使用**<code>**new Promise()**</code>**来创建promise对象，但是也可以使用**<code>**promise.resolve**</code>**和 **<code>**promise.reject**</code>**这两个方法：**
+**一般情况下都会使用**`new Promise()`**来创建promise对象，但是也可以使用**`promise.resolve`**和 **`promise.reject`**这两个方法：**
 
 * **Promise.resolve**
 

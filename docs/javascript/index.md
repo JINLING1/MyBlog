@@ -10,12 +10,10 @@ comments: false
 
 ## 从这里开始
 
-- [JavaScript](/javascript/js)
-
-## 计划整理
-
-- 执行上下文与作用域链
-- 原型和继承
-- Promise 与事件循环
-- 模块系统
-- 内存管理与性能
+- [JavaScript数据类型](/javascript/js-datatype)
+- [JavaScript-ES6](/javascript/js-es6)
+- [JavaScript基础](/javascript/js-basic)
+- [JavaScript原型](/javascript/js-prototype)
+- [JavaScript闭包](/javascript/js-closure)
+- [JavaScript: 关于this](/javascript/js-this)
+- [JavaScript异步编程](/javascript/js-asynchronous-programming)

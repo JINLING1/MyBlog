@@ -1,6 +1,6 @@
 ---
 title: JavaScript数据类型
-description: 待补充
+description: 介绍js的数据类型，以及如何判断数据类型，隐式类型转换等知识
 date: 2026-10-1
 tags:
   - JavaScript
@@ -62,23 +62,26 @@ console.log(typeof undefined);       // undefined
 console.log(typeof null);            // object
 ```
 
-其中数组、对象、null都会被判断为object，其他判断都正确。
+其中**数组、对象、null都会被判断为object**，**函数被判断为function**
+
+(**null被判断为object为历史bug**，函数是typeof做了特殊处理，判断为function，而非object)
 
 **（2）instanceof**
 
-`instanceof`可以正确判断对象的类型，**其内部运行机制是****判断在其原型链中能否找到该类型的原型**。
+`instanceof`可以**正确判断对象的类型**，其内部运行机制是**判断在左边对象的原型链中能否找到右边构造函数的prototype属性**。
 
 ```javascript
-console.log(2 instanceof Number);                    // false
-console.log(true instanceof Boolean);                // false 
-console.log('str' instanceof String);                // false 
+//语法为： 对象 instanceof 构造函数
+console.log(2 instanceof Number);// false
+console.log(true instanceof Boolean);// false 
+console.log('str' instanceof String);// false 
  
-console.log([] instanceof Array);                    // true
-console.log(function(){} instanceof Function);       // true
-console.log({} instanceof Object);                   // true
+console.log([] instanceof Array); // true
+console.log(function(){} instanceof Function);// true
+console.log({} instanceof Object);// true
 ```
 
-可以看到，`instanceof`**只能正确判断引用数据类型**，而不能判断基本数据类型。`instanceof` 运算符可以用来测试一个对象在其原型链中是否存在一个构造函数的 `prototype` 属性。
+可以看到，`instanceof`**只能正确判断引用数据类型**，而不能判断基本数据类型。
 
 **（3） constructor**
 
@@ -91,12 +94,12 @@ console.log((function() {}).constructor === Function); // true
 console.log(({}).constructor === Object); // true
 ```
 
-`constructor`有两个作用，一是判断数据的类型，二是对象实例通过 `constrcutor` 对象访问它的构造函数。需要注意，如果创建一个对象来改变它的原型，`constructor`就不能用来判断数据类型了：
+`constructor`：**对象实例通过从原型继承而来的`constrcutor`属性访问它的构造函数**。需要注意，如果创建一个对象来改变它的原型，`constructor`就不能用来判断数据类型了： 
 
 ```javascript
 function Fn(){};
  
-Fn.prototype = new Array();
+Fn.prototype = new Array();//通过prototype属性修改原型对象
  
 var f = new Fn();
  
@@ -106,80 +109,70 @@ console.log(f.constructor===Array); // true
 
 **（4）Object.prototype.toString.call()**
 
-`Object.prototype.toString.call()` 使用 Object 对象的原型方法 toString 来判断数据类型：
+`Object.prototype.toString.call()` 
+使用 Object 对象的原型方法 toString 来判断数据类型：
 
 ```javascript
 var a = Object.prototype.toString;
- 
-console.log(a.call(2));
-console.log(a.call(true));
-console.log(a.call('str'));
-console.log(a.call([]));
-console.log(a.call(function(){}));
-console.log(a.call({}));
-console.log(a.call(undefined));
-console.log(a.call(null));
+//调用Object 上原型 toString 方法,让它的 this 指向 obj
+console.log(a.call(2));            // "[object Number]"
+console.log(a.call(true));         // "[object Boolean]"
+console.log(a.call('str'));        // "[object String]"
+console.log(a.call([]));           // "[object Array]"
+console.log(a.call(function(){})); // "[object Function]"
+console.log(a.call({}));           // "[object Object]"
+console.log(a.call(undefined));    // "[object Undefined]"
+console.log(a.call(null));         // "[object Null]"
 ```
 
-同样是检测对象obj调用toString方法，obj.toString()的结果和Object.prototype.toString.call(obj)的结果不一样，这是为什么？
+对于检测对象obj 进行调用toString方法：
+`obj.toString()` 的结果 和 `Object.prototype.toString.call(obj)` 的结果不一样，这是为什么？
 
-这是因为toString是Object的原型方法，而Array、function等**类型作为Object的实例，都重写了toString方法**。不同的对象类型调用toString方法时，根据原型链的知识，调用的是对应的重写之后的toString方法（function类型返回内容为函数体的字符串，Array类型返回元素组成的字符串…），而不会去调用Object上原型toString方法（返回对象的具体类型），所以采用obj.toString()不能得到其对象类型，只能将obj转换为字符串类型；因此，在想要得到对象的具体类型时，应该调用Object原型上的toString方法。
+这是因为 toString 是 Object 的原型方法，而 **Array、function 等类型重写了 toString方法**。
 
-## 4. null和undefined区别
+不同的对象类型调用 toString 方法时，根据原型链的知识，调用的是对应的重写之后的toString 方法（ function 类型返回内容为函数体的字符串，Array 类型返回元素组成的字符串…），而不会去调用 **Object 上原型 toString 方法（返回对象的具体类型）**，所以**采用obj.toString()不能得到其对象类型，只能将obj转换为字符串类型**；
+
+## 3. null和undefined区别
 
 首先 Undefined 和 Null 都是基本数据类型，这两个基本数据类型分别都只有一个值，就是 undefined 和 null。
 
-undefined 代表的含义是**未定义**，null 代表的含义是**空对象**。一般变量声明了但还没有定义的时候会返回 undefined，null主要用于赋值给一些可能会返回对象的变量，作为初始化。
+undefined 代表的含义是**未定义**，变量声明了但未赋值、函数没有返回值、访问对象不存在的属性时，都会返回 `undefined`。
 
-undefined 在 JavaScript 中不是一个保留字，这意味着可以使用 undefined 来作为一个变量名，但是这样的做法是非常危险的，它会影响对 undefined 值的判断。我们可以通过一些方法获得安全的 undefined 值，比如说 void 0。
+null 代表的含义是**空对象**。通常用于**人为赋值**给一个预期返回对象的变量，作为初始化的空值。
 
-当对这两种类型使用 typeof 进行判断时，Null 类型化会返回 “object”，这是一个历史遗留的问题。当使用双等号对两种类型的值进行比较时会返回 true，使用三个等号时会返回 false。
+当对这两种类型使用 typeof 进行判断时，`typeof null`会返回 `object`，这是一个历史遗留的问题。
+`null == undefined` 返回 `true`，`null === undefined` 返回 `false`。
 
-## 5. typeof null 的结果是什么，为什么？
+> undefined 在 JavaScript 中不是保留字，也不是关键字，这意味着非严格模式下可以使用 undefined 来作为一个变量名，但是这样的做法是非常危险的，它会影响对 undefined 值的判断。我们可以通过一些方法获得安全的 undefined 值，比如说 void 0。（`void` 是一个**运算符**，**对任何表达式求值，然后返回 `undefined`。**）
 
-typeof null 的结果是Object。
 
-在 JavaScript 第一个版本中，所有值都存储在 32 位的单元中，每个单元包含一个小的 **类型标签(1-3 bits)** 以及当前要存储值的真实数据。类型标签存储在每个单元的低位中，共有五种数据类型：
 
-```javascript
-000: object   - 当前存储的数据指向一个对象。
-  1: int      - 当前存储的数据是一个 31 位的有符号整数。
-010: double   - 当前存储的数据指向一个双精度的浮点数。
-100: string   - 当前存储的数据指向一个字符串。
-110: boolean  - 当前存储的数据是布尔值。
-```
-
-如果最低位是 1，则类型标签标志位的长度只有一位；如果最低位是 0，则类型标签标志位的长度占三位，为存储其他四种数据类型提供了额外两个 bit 的长度。
-
-有两种特殊数据类型：
-
-* undefined的值是 (-2)<sup>30</sup>(一个超出整数范围的数字)；
-* null 的值是机器码 NULL 指针(null 指针的值全是 0)
-
-那也就是说null的类型标签也是000，和Object的类型标签一样，所以会被判定为Object。
-
-## 6. instanceof 操作符的实现原理及实现
+## 4. instanceof 操作符的实现原理及实现
 
 instanceof 运算符用于判断构造函数的 prototype 属性是否出现在对象的原型链中的任何位置。
 
 ```javascript
 function myInstanceof(left, right) {
-  // 获取对象的原型
-  let proto = Object.getPrototypeOf(left)
-  // 获取构造函数的 prototype 对象
-  let prototype = right.prototype; 
- 
-  // 判断构造函数的 prototype 对象是否在对象的原型链上
-  while (true) {
-    if (!proto) return false;
-    if (proto === prototype) return true;
-    // 如果没有找到，就继续从其原型上找，Object.getPrototypeOf方法用来获取指定对象的原型
-    proto = Object.getPrototypeOf(proto);
-  }
+    // 基本类型直接返回 false
+    if (left === null || (typeof left !== 'object' && typeof left !== 'function')) {
+        return false
+    }
+    // 获取对象的原型
+    let proto = Object.getPrototypeOf(left)
+    // 获取构造函数的 prototype 对象
+    let prototype = right.prototype; 
+
+    // 判断构造函数的 prototype 对象是否在对象的原型链上
+    while (true) {
+        if (!proto) return false;
+        if (proto === prototype) return true;
+        // 如果没有找到，就继续从其原型上找，Object.getPrototypeOf方法用来获取指定对象的原型
+        proto = Object.getPrototypeOf(proto);
+    }
 }
 ```
 
-## 7. 为什么0.1+0.2 ! == 0.3，如何让其相等  
+## 5. 为什么0.1+0.2 ! == 0.3，如何让其相等  
 
 在开发过程中遇到类似这样的问题：
 
@@ -188,65 +181,17 @@ let n1 = 0.1, n2 = 0.2
 console.log(n1 + n2)  // 0.30000000000000004
 ```
 
-这里得到的不是想要的结果，要想等于0.3，就要把它进行转化：
+原因：计算机用**二进制浮点数**存数字，0.1 和 0.2 都**无法用二进制精确表示**，只能存一个很近似的值。这两个近似值相加，误差累积，结果就成了 `0.30000000000000004`，不是 `0.3`。
+
+要想等于0.3，就要把它进行转化：
 
 ```javascript
-(n1 + n2).toFixed(2) // 注意，toFixed为四舍五入
+(n1 + n2).toFixed(2) //toFixed为四舍五入
 ```
 
-`toFixed(num)` 方法可把 Number 四舍五入为指定小数位数的数字。那为什么会出现这样的结果呢？
+`toFixed(num)` 方法可把 Number 四舍五入为指定小数位数的数字。
 
-计算机是通过二进制的方式存储数据的，所以计算机计算0.1+0.2的时候，实际上是计算的两个数的二进制的和。0.1的二进制是`0.0001100110011001100...`（1100循环），0.2的二进制是：`0.00110011001100...`（1100循环），这两个数的二进制都是无限循环的数。那JavaScript是如何处理无限循环的二进制小数呢？
-
-一般我们认为数字包括整数和小数，但是在 JavaScript 中只有一种数字类型：Number，它的实现遵循IEEE 754标准，使用64位固定长度来表示，也就是标准的double双精度浮点数。在二进制科学表示法中，双精度浮点数的小数部分最多只能保留52位，再加上前面的1，其实就是保留53位有效数字，剩余的需要舍去，遵从“0舍1入”的原则。
-
-根据这个原则，0.1和0.2的二进制数相加，再转化为十进制数就是：`0.30000000000000004`。
-
-下面看一下**双精度数是如何保存**的：
-
-![1603641384908-7958dffa-6d26-4e36-963e-b41c9e3ca8b0.png](assets/1603641384908-7958dffa-6d26-4e36-963e-b41c9e3ca8b0-876182.png)
-
-* 第一部分（蓝色）：用来存储符号位（sign），用来区分正负数，0表示正数，占用1位
-* 第二部分（绿色）：用来存储指数（exponent），占用11位
-* 第三部分（红色）：用来存储小数（fraction），占用52位
-
-对于0.1，它的二进制为：
-
-```javascript
-0.00011001100110011001100110011001100110011001100110011001 10011...
-```
-
-转为科学计数法（科学计数法的结果就是浮点数）：
-
-```javascript
-1.1001100110011001100110011001100110011001100110011001*2^-4
-```
-
-可以看出0.1的符号位为0，指数位为-4，小数位为：
-
-```javascript
-1001100110011001100110011001100110011001100110011001
-```
-
-那么问题又来了，**指数位是负数，该如何保存**呢？
-
-IEEE标准规定了一个偏移量，对于指数部分，每次都加这个偏移量进行保存，这样即使指数是负数，那么加上这个偏移量也就是正数了。由于JavaScript的数字是双精度数，这里就以双精度数为例，它的指数部分为11位，能表示的范围就是0~2047，IEEE固定**双精度数的偏移量为1023**。
-
-* 当指数位不全是0也不全是1时(规格化的数值)，IEEE规定，阶码计算公式为 e-Bias。 此时e最小值是1，则1-1023= -1022，e最大值是2046，则2046-1023=1023，可以看到，这种情况下取值范围是`-1022~1013`。
-* 当指数位全部是0的时候(非规格化的数值)，IEEE规定，阶码的计算公式为1-Bias，即1-1023= -1022。
-* 当指数位全部是1的时候(特殊值)，IEEE规定这个浮点数可用来表示3个特殊值，分别是正无穷，负无穷，NaN。 具体的，小数位不为0的时候表示NaN；小数位为0时，当符号位s=0时表示正无穷，s=1时候表示负无穷。
-
-对于上面的0.1的指数位为-4，-4+1023 = 1019 转化为二进制就是：`1111111011`.
-
-所以，0.1表示为：
-
-```javascript
-0 1111111011 1001100110011001100110011001100110011001100110011001
-```
-
-说了这么多，是时候该最开始的问题了，如何实现0.1+0.2=0.3呢？
-
-对于这个问题，一个直接的解决方法就是设置一个误差范围，通常称为“机器精度”。对JavaScript来说，这个值通常为2<sup>-52</sup>，在ES6中，提供了`Number.EPSILON`属性，而它的值就是2<sup>-52</sup>，只要判断`0.1+0.2-0.3`是否小于`Number.EPSILON`，如果小于，就可以判断为0.1+0.2 ===0.3
+一个直接的解决方法就是**设置一个误差范围**，通常称为“机器精度”。对JavaScript来说，这个值通常为2<sup>-52</sup>，在ES6中，提供了**`Number.EPSILON`**属性，而它的值就是2<sup>-52</sup>，只要判断`0.1+0.2-0.3`是否小于`Number.EPSILON`，如果小于，就可以判断为0.1+0.2 ===0.3
 
 ```javascript
 function numberepsilon(arg1,arg2){                   
@@ -258,24 +203,32 @@ console.log(numberepsilon(0.1 + 0.2, 0.3)); // true
 
 
 
-## 14. || 和 && 操作符的返回值？
+## 6. || 和 && 操作符的返回值？
 
-|| 和 && 首先会对第一个操作数执行条件判断，如果其不是布尔值就先强制转换为布尔类型，然后再执行条件判断。
+|| 和 && 首先会对 第一个操作数 执行 条件判断，如果其不是布尔值就先强制转换为布尔类型，然后再执行条件判断。
 
 * 对于 || 来说，如果条件判断结果为 true 就返回第一个操作数的值，如果为 false 就返回第二个操作数的值。
 * && 则相反，如果条件判断结果为 true 就返回第二个操作数的值，如果为 false 就返回第一个操作数的值。
 
-**|| 和 && 返回它们其中一个操作数的值，而非条件判断的结果**
+**|| 和 && 在js中为短路求值，返回它们其中一个操作数的值，而非条件判断的结果**
 
-## 15. Object.is() 与比较操作符 “ === ”、 “ ==” 的区别？
+## 7. Object.is() 与比较操作符 “ === ”、 “ ==” 的区别？
 
-* 使用双等号（==）进行相等判断时，如果两边的类型不一致，则会进行强制类型转化后再进行比较。
-* 使用三等号（===）进行相等判断时，如果两边的类型不一致时，不会做强制类型准换，直接返回 false。
-* 使用 Object.is 来进行相等判断时，一般情况下和三等号的判断相同，它处理了一些特殊的情况，比如 -0 和 +0 不再相等，两个 NaN 是相等的。
+* 使用**双等号（==）**进行相等判断时，如果两边的类型不一致，则会进行**强制类型转化**后再进行比较。
+* 使用**三等号（===）**进行相等判断时，如果两边的类型不一致时，**不会做强制类型转换**，直接返回 false。
+* 使用 **Object.is** 来进行相等判断时，**一般情况下和三等号的判断相同**
+  但它处理了一些特殊的情况
+  * **`Object.is(+0, -0)` → `false`（`===` 是 `true`）**
+  * **`Object.is(NaN, NaN)` → `true`（`===` 是 `false`）**。
 
-## 17. JavaScript 中如何进行隐式类型转换？
 
-首先要介绍`ToPrimitive`方法，这是 JavaScript 中每个值隐含的自带的方法，用来将值 （无论是基本类型值还是对象）转换为基本类型值。如果值为基本类型，则直接返回值本身；如果值为对象，其看起来大概是这样：
+## 8. JavaScript 中如何进行隐式类型转换？
+
+**ECMAScript 规范里的一个抽象操作**：**`ToPrimitive`**：（Primitive：原始类型，原始值）
+它是规范内部定义的一套转换步骤，用来**将值转换为基本类型值**。
+
+- 如果值为基本类型，则直接返回值本身
+- 如果值为对象，其看起来大概是这样：
 
 ```javascript
 /**
@@ -289,78 +242,88 @@ ToPrimitive(obj,type)
 
 **（1）当 `type` 为 `number` 时规则如下：**
 
-* 调用`obj`的`valueOf`方法，如果为原始值，则返回，否则下一步；
-* 调用`obj`的`toString`方法，后续同上；
+* 调用`obj`的`valueOf`方法，如果为基本类型值，则返回该值（），否则下一步；
+
+* 调用`obj`的`toString`方法，如果为原始值，则返回该值，否则下一步；
+
 * 抛出`TypeError` 异常。
 
-**（2）当**type`**为**`string`**时规则如下：**
+  > - 普通对象 `valueOf()` 返回自己（对象），不算成功
+  > - 于是调 `toString()`，返回 `"[object Object]"`
+  > - 再 `Number("[object Object]")` → `NaN`
+  > - 所以普通对象转数字就是 `NaN`
+  >
+  > **只有内置对象（Number、String、Date 等）有基本类型值，才能转出有意义的数字**
 
-* 调用`obj`的`toString`方法，如果为原始值，则返回，否则下一步；
-* 调用`obj`的`valueOf`方法，后续同上；
+**（2）当 `type` 为 `string` 时规则如下：**
+
+* 调用`obj`的`toString`方法，如果为原始值，则返回该值，否则下一步；
+* 调用`obj`的`valueOf`方法，如果为原始值，则返回该值，否则下一步；
 * 抛出`TypeError` 异常。
 
-可以看出两者的主要区别在于调用`toString`和`valueOf`的先后顺序。默认情况下：
+| 方法       | 作用                     | 说明                                                         |
+| :--------- | :----------------------- | :----------------------------------------------------------- |
+| `valueOf`  | 返回对象的**基本类型值   | 普通对象没有基本类型值，返回自身，而某些内置对象**有**基本类型值，会返回基本类型值 |
+| `toString` | 返回对象的**字符串表示** | 普通对象返回：`"[object Object]"` （例如 "[object Array]"）<br />数组返回字符串：例如"1,2"<br />Date返回日期字符串 |
 
-* 如果对象为 Date 对象，则`type`默认为`string`；
-* 其他情况下，`type`默认为`number`。
+可以看出两者的主要区别在于调用`toString`和`valueOf`的先后顺序。**默认情况下**：
 
-总结上面的规则，对于 Date 以外的对象，转换为基本类型的大概规则可以概括为一个函数：
+* 如果对象为 **Date** 对象，则`type`默认为**`string`**；
+* 其他情况下，`type`默认为**`number`**。
 
-```javascript
-var objToNumber = value => Number(value.valueOf().toString())
-objToNumber([]) === 0
-objToNumber({}) === NaN
-```
 
-而 JavaScript 中的隐式类型转换主要发生在`+、-、*、/`以及`==、>、<`这些运算符之间。而这些运算符只能操作基本类型值，所以在进行这些运算前的第一步就是将两边的值用`ToPrimitive`转换成基本类型，再进行操作。
 
-以下是基本类型的值在不同操作符的情况下隐式转换的规则 （对于对象，其会被`ToPrimitive`转换成基本类型，所以最终还是要应用基本类型转换规则）：
+**JavaScript 中的隐式类型转换主要发生在`+、-、*、/`以及`==、>、<`这些运算符之间**。而这些运算符只能操作基本类型值，所以在进行这些运算前的第一步就是将两边的值用`ToPrimitive`转换成基本类型，再进行操作。
 
-1. **`+`**操作符:  `+`操作符的两边有至少一个`string`类型变量时，两边的变量都会被隐式转换为字符串；其他情况下两边的变量都会被转换为数字。
+以下是**基本类型**的值在**不同操作符**的情况下**隐式转换**的规则 
+
+1. **`+`**操作符:  `+`操作符的两边**有至少一个`string`类型变量**时，两边的变量**都会被隐式转换为字符串**；其他情况下两边的变量都会被转换为数字。
 
 ```javascript
 1 + '23' // '123'
  1 + false // 1 
- 1 + Symbol() // Uncaught TypeError: Cannot convert a Symbol value to a number
+ 1 + Symbol() // Uncaught TypeError: Cannot convert a Symbol value to a number （ Symbol 明确禁止转数字，所以抛 TypeError）
  '1' + false // '1false'
  false + true // 1
 ```
 
-2. `-`**、**`*`**、**`/`**操作符**`NaN`也是一个数字
+2. `-`**、**`*`**、**`/`**操作符** ：**两边转数字，再算**
 
 ```javascript
 1 * '23' // 23
  1 * false // 0
- 1 / 'aa' // NaN
+ 1 / 'aa' // NaN ，NaN也属于数字
 ```
 
 3. 对于**`==`**操作符
 
-操作符两边的值都尽量转成`number`：
+操作符两边的值都尽量**转成`number`**：
 
 ```javascript
 3 == true // false, 3 转为number为3，true转为number为1
 '0' == false //true, '0'转为number为0，false转为number为0
-'0' == 0 // '0'转为number为0
+'0' == 0 //true, '0'转为number为0
 ```
 
 4. **对于**`<`**和**`>`**比较符**
 
-如果两边都是字符串，则比较字母表顺序：
+**如果两边都是字符串，则比较字母表顺序**：
 
 ```javascript
 'ca' < 'bd' // false
 'a' < 'b' // true
 ```
 
-其他情况下，转换为数字再比较：
+**其他情况下，转换为数字**再比较：
 
 ```javascript
 '12' < 13 // true
 false > -1 // true
 ```
 
-以上说的是基本类型的隐式转换，而对象会被`ToPrimitive`转换为基本类型再进行转换：
+
+
+以上说的是基本类型的隐式转换，而**对象会被`ToPrimitive`转换为基本类型再进行转换**：
 
 ```javascript
 var a = {}
@@ -372,9 +335,11 @@ a > 2 // false
 ```javascript
 a.valueOf() // {}, 上面提到过，ToPrimitive默认type为number，所以先valueOf，结果还是个对象，下一步
 a.toString() // "[object Object]"，现在是一个字符串了
-Number(a.toString()) // NaN，根据上面 < 和 > 操作符的规则，要转换成数字
+Number(a.toString()) // 结果为NaN，根据上面 < 和 > 操作符的规则，要转换成数字
 NaN > 2 //false，得出比较结果
 ```
+
+NaN 表示“不是一个有效数字”，它和任何数比都没有意义，所以规范规定**NaN的所有比较都返回 false**（除了：!=` 和 `!== ）
 
 又比如：
 
@@ -396,7 +361,9 @@ a + b // "[object Object][object Object]"
 
 
 
-## 20. object.assign和扩展运算法是深拷贝还是浅拷贝，两者区别
+## 9 object.assign和扩展运算是深拷贝还是浅拷贝，两者区别
+
+**二者都是浅拷贝，只拷贝第一层，嵌套的引用类型还是共享同一个地址**
 
 扩展运算符：
 
@@ -422,6 +389,6 @@ console.log(outObj) // {inObj: {a: 2, b: 2}}
 
 可以看到，两者都是浅拷贝。
 
-* Object.assign()方法接收的第一个参数作为目标对象，后面的所有参数作为源对象。然后把所有的源对象合并到目标对象中。它会修改了一个对象，因此会触发 ES6 setter。
-* 扩展操作符（…）使用它时，数组或对象中的每一个值都会被拷贝到一个新的数组或对象中。它不复制继承的属性或类的属性，但是它会复制ES6的 symbols 属性。
+* Object.assign()方法接收的第一个参数作为目标对象，后面的所有参数作为源对象。然后**把所有的源对象的属性合并到目标对象中**。它会修改了一个对象（目标对象），属于赋值操作，因此会触发 ES6 setter。
+* 扩展操作符（…）使用它时，**数组或对象中的每一个值都会被拷贝到一个新的数组或对象中**。它不是“赋值到已有对象”，而是**创建新对象、定义新属性**。注意：它不复制 继承的属性 或 类的属性，但是它会复制ES6的 symbols 属性。
 

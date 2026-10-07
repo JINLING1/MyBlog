@@ -1,7 +1,7 @@
 ---
 title: JavaScript数据类型
 description: 介绍js的数据类型，以及如何判断数据类型，隐式类型转换等知识
-date: 2026-10-1
+date: 2026-10-01
 tags:
   - JavaScript
   - datatype

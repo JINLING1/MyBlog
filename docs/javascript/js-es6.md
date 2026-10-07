@@ -50,19 +50,20 @@ const保证的并不是变量的值不能改动，而是**变量绑定不能改�
 
 **（1）箭头函数比普通函数更加简洁**
 
-* 如果没有参数，就直接写一个空括号即可
-* 如果只有一个参数，可以省去参数的括号
-* 如果有多个参数，用逗号分割
-* 如果函数体的返回值只有一句，可以省略大括号
-* 如果函数体不需要返回值，且只有一句话，可以给这个语句前面加一个void关键字。最常见的就是调用一个函数：
+* 没有参数，直接写一个空括号
+* 一个参数，可以省去参数的括号
+* 多个参数，用逗号分割
+* 返回值只有一句，可以省略大括号{}
+* 不需要返回值，且只有一句话。
 
 ```javascript
-let fn = () => void doesNotReturn();
+// 没有返回值，只有一句
+let fn = () => console.log('hello');
 ```
 
 **（2）箭头函数没有自己的this**
 
-箭头函数不会创建自己的this， 所以它没有自己的this，它只会在自己作用域的上一层继承this。所以箭头函数中this的指向在它在定义时已经确定了，之后不会改变。
+箭头函数不会创建自己的this，它的 `this` 是继承了**定义时所在的外层执行环境**的 `this`。所以箭头函数中this的指向在它在定义时已经确定了，之后不会改变。
 
 **（3）箭头函数继承来的this指向永远不会改变**
 
@@ -77,13 +78,13 @@ var obj = {
     console.log(this.id);
   }
 };
-obj.a();    // 'OBJ'
+obj.a();    // 'OBJ' 普通函数this指向调用它的对象，即obj
 obj.b();    // 'GLOBAL'
-new obj.a()  // undefined
+new obj.a()  // undefined 普通函数this指向调用它的对象，即空对象{}
 new obj.b()  // Uncaught TypeError: obj.b is not a constructor
 ```
 
-对象obj的方法b是使用箭头函数定义的，这个函数中的this就永远指向它定义时所处的全局执行环境中的this，即便这个函数是作为对象obj的方法调用，this依旧指向Window对象。需要注意，定义对象的大括号`{}`是无法形成一个单独的执行环境的，它依旧是处于全局执行环境中。
+对象obj的方法b是使用箭头函数定义的，这个函数中的this就永远指向它定义时所处的全局执行环境中的this，即便这个函数是作为对象obj的方法调用，this依旧指向Window对象。需要注意，**定义对象的大括号`{}`是无法形成一个单独的执行环境的**，它依旧是处于全局执行环境中。
 
 **（4）call()、apply()、bind()等方法不能改变箭头函数中this的指向**
 
@@ -100,19 +101,23 @@ fun1.bind({id: 'Obj'})();   // 'Global'
 
 **（5）箭头函数不能作为构造函数使用**
 
-构造函数在new的步骤在上面已经说过了，实际上第二步就是将函数中的this指向该对象。 但是由于箭头函数时没有自己的this的，且this指向外层的执行环境，且不能改变指向，所以不能当做构造函数使用。
+构造函数在new的步骤在JS基础一节已经说过了，实际上第二步就是将函数中的this指向该对象。 但是由于**箭头函数时没有自己的this的**，且this继承自外层执行环境，且不能改变指向，且**箭头函数没有prototype属性**，所以不能当做构造函数使用。
 
 **（6）箭头函数没有自己的arguments**
 
 箭头函数没有自己的arguments对象。在箭头函数中访问arguments实际上获得的是它外层函数的arguments值。
 
+> **`arguments`**：函数内部自动存在的一个类数组对象，包含调用时实际传入的所有实参。
+
 **（7）箭头函数没有prototype**
 
-**（8）箭头函数不能用作Generator函数，不能使用yeild关键字**
+**（8）箭头函数不能用作Generator函数，不能使用yield关键字**
 
+> Generator 函数是一种可以“暂停”和“恢复”的特殊函数。yield是用于暂停的关键字
 
+**重点总结**：**没有自己的 `this`**、**不能作为构造函数**、**没有 `arguments`**
 
-## 7. 对对象与数组的解构的理解
+## 4. 对对象与数组的解构的理解
 
 解构是 ES6 提供的一种新的提取数据的模式，这种模式能够从对象或数组里有针对性地拿到想要的数值。
 
@@ -138,6 +143,15 @@ const [a,,c] = [1,2,3]
 
 ![1616076913186-eb8be693-9b19-48e5-bda5-9dbd7cc77ea6.jpeg](assets/1616076913186-eb8be693-9b19-48e5-bda5-9dbd7cc77ea6-949725.jpeg)
 
+> ### 数组解构可以设默认值
+>
+> ```js
+> const [a = 1, b = 2] = []
+> console.log(a, b)  // 1 2
+> ```
+>
+> 如果对应位置是 `undefined`，可以用默认值。
+
 **2）对象的解构**
 
 在解构对象时，是以属性的名称为匹配条件，来提取想要的数据的。现在定义一个对象：
@@ -153,9 +167,13 @@ const stu = {
 
 ```javascript
 const { name, age } = stu
+//可以重命名
+//把stu.name取出来，赋给变量 userName
+const { name: userName, age } = stu
+console.log(userName)  // 'Bob'
 ```
 
-这样就得到了 name 和 age 两个和 stu 平级的变量：
+这样就得到了 name 和 age 两个独立的变量：
 
 ![1616076913314-53687a23-07ef-4a01-a78a-a0304f2b2826.jpeg](assets/1616076913314-53687a23-07ef-4a01-a78a-a0304f2b2826-168236.jpeg)
 
@@ -177,7 +195,7 @@ console.log(name)  // 'Bob'
 
 
 
-## 10. ES6中模板语法与字符串处理
+## 5. ES6中模板语法与字符串处理
 
 ES6 提出了“模板语法”的概念。在 ES6 以前，拼接字符串是很麻烦的事情：
 
@@ -194,15 +212,17 @@ var finalString = 'my name is ' + name + ', I work as a ' + career + ', I love '
 var name = 'css'   
 var career = 'coder' 
 var hobby = ['coding', 'writing']
-var finalString = `my name is ${name}, I work as a ${career} I love ${hobby[0]} and ${hobby[1]}`
+var finalString = `my name is ${name}, I work as a ${career}, I love ${hobby[0]} and ${hobby[1]}`
 ```
 
-模板字符串的第一个优势——允许**用${}的方式嵌入变量**。但这还不是问题的关键，模板字符串的关键优势有两个：
+模板字符串的优势：
+
+- 允许**用${}的方式嵌入变量**
 
 * 在模板字符串中，**空格、缩进、换行都会被保留**
 * 模板字符串完全**支持“运算”式的表达式**，可以在${}里完成一些计算
 
-基于第一点，可以在模板字符串里无障碍地直接写 html 代码：
+可以在模板字符串里无障碍地直接写 html 代码：
 
 ```javascript
 let list = `
@@ -211,10 +231,10 @@ let list = `
 		<li>列表项2</li>
 	</ul>
 `;
-console.log(message); // 正确输出，不存在报错
+console.log(list); 
 ```
 
-基于第二点，可以把一些简单的计算和调用丢进 ${} 来做：
+可以把一些简单的计算和调用丢进 ${} 来做：
 
 ```javascript
 function add(a, b) {
@@ -226,7 +246,7 @@ add(1, 2) // 输出 '1 + 2 = 3'
 
 除了模板语法外， ES6中还新增了一系列的字符串方法用于提升开发效率：
 
-* **存在性判定**：在过去，当判断一个字符/字符串是否在某字符串中时，只能用 indexOf > -1 来做。现在 ES6 提供了三个方法：includes、startsWith、endsWith，它们都会返回一个布尔值来告诉你是否存在。
+* **存在性判定**：在过去，当判断一个字符/字符串是否在某字符串中时，只能用 **indexOf > -1** 来做。现在 ES6 提供了三个方法：**includes、startsWith、endsWith**，它们都会返回一个布尔值来告诉你是否存在。
   * **includes**：判断字符串与子串的包含关系：
 
 ```javascript
@@ -253,7 +273,6 @@ const father = 'xixi haha hehe'
 * **自动重复**：可以使用 repeat 方法来使同一个字符串输出多次（被连续复制多次）：
 
 ```javascript
-const sourceCode = 'repeat for 3 times;'
-const repeated = sourceCode.repeat(3) 
-console.log(repeated) // repeat for 3 times;repeat for 3 times;repeat for 3 times;
+const str = 'abc'
+str.repeat(3)  // 'abcabcabc'
 ```

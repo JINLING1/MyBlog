@@ -10,12 +10,4 @@ comments: false
 
 ## 从这里开始
 
-- [响应式系统的最小心智模型](/vue/reactivity)
-
-## 计划整理
-
-- Composition API 设计模式
-- 组件通信与状态边界
-- 渲染流程和更新调度
-- Vue Router 与异步页面
-- 性能优化和测试
+- [Vue](/vue/vue)

@@ -350,7 +350,7 @@ Vue.component('custom-input', {
 
   ### 16. data为什么是一个函数而不是对象
 
-  <font style="color:#333333;">Vue组件可能存在多个实例，如果使用对象形式定义</font><font style="color:#333333;">data</font><font style="color:#333333;">，则会导致它们共用一个</font><font style="color:#333333;">data对象，那么状态变更将会影响所有组件实例，这是不合理的；采用函数形式定义，在</font><font style="color:#333333;">initData时会将其作为工厂函数返回全新</font><font style="color:#333333;">data</font><font style="color:#333333;">对象，有效规避多实例之间状态污染问题。而在Vue根实例创建过程中则不存在该限制，也是因为根实例只能有一个，不需要担心这种情况。</font>
+  Vue组件可能存在多个实例，如果使用对象形式定义data，则会导致它们共用一个data对象，那么状态变更将会影响所有组件实例，这是不合理的；采用函数形式定义，在initData时会将其作为工厂函数返回全新data对象，有效规避多实例之间状态污染问题。而在Vue根实例创建过程中则不存在该限制，也是因为根实例只能有一个，不需要担心这种情况。
 
   ### 17. 对keep-alive的理解，它是如何实现的，具体缓存的是什么？
 
@@ -774,7 +774,7 @@ Vue.component('custom-input', {
   **（2）mergeOptions 的执行过程**
 
   * 规范化选项（normalizeProps、normalizelnject、normalizeDirectives)
-  * <font style="background-color:transparent;">对未合并的选项，进行判断</font>
+  * 对未合并的选项，进行判断
 
   ```javascript
   if(!child._base) {
@@ -1222,11 +1222,11 @@ Vue.component('custom-input', {
 
   ### 43. **v-i&#x66;****和****&#x76;-for哪个优先级更高？如果同时出现，应如何优化？**
 
-  <font style="color:#333333;">v-for优先于</font><font style="color:#333333;">v-if</font><font style="color:#333333;">被解析，</font><font style="color:#333333;background-color:transparent;">如果同时出现，每次渲染都会</font>**<font style="color:#333333;background-color:transparent;">先执行循环再判断条件</font>**<font style="color:#333333;background-color:transparent;">，无论如何循环都不可避免，浪费了性能。</font>
+  v-for优先于v-if被解析，如果同时出现，每次渲染都会**先执行循环再判断条件**，无论如何循环都不可避免，浪费了性能。
 
-  <font style="color:#333333;"></font>
+  
 
-  <font style="color:#333333;">要避免出现这种情况，则在外层嵌套</font><font style="color:#333333;">template</font><font style="color:#333333;">，在这一层进行</font><font style="color:#333333;">v-if</font><font style="color:#333333;">判断，然后在内部进行</font><font style="color:#333333;">v-for循环。如果条件出现在循环内部，可通过计算属性提前过滤掉那些不需要显示的项。</font>
+  要避免出现这种情况，则在外层嵌套template，在这一层进行v-if判断，然后在内部进行v-for循环。如果条件出现在循环内部，可通过计算属性提前过滤掉那些不需要显示的项。
 
   ### 44. 对Vue组件化的理解
 
@@ -1245,9 +1245,9 @@ Vue.component('custom-input', {
   3. **灵活性**：渐进式框架的最大优点就是灵活性，如果应用足够小，我们可能仅需要vue核心特性即可完成功能；随着应用规模不断扩大，我们才可能逐渐引入路由、状态管理、vue-cli等库和工具，不管是应用体积还是学习难度都是一个逐渐增加的平和曲线。
   4. **高效性：**超快的虚拟DOM和diﬀ算法使我们的应用拥有最佳的性能表现。追求高效的过程还在继续，vue3中引入Proxy对数据响应式改进以及编译器中对于静态内容编译的改进都会让vue更加高效。
 
-  ### 46. 常见的<font style="color:#333333;">Vue</font><font style="color:#333333;">性能优化方法</font>
+  ### 46. 常见的Vue性能优化方法
 
-  1. <font style="color:#333333;">路由懒加载</font>
+  1. 路由懒加载
 
   ```vue
   const router = new VueRouter({ routes: [
@@ -1256,7 +1256,7 @@ Vue.component('custom-input', {
   })
   ```
 
-  2. <font style="color:#333333;">keep-alive缓存页面</font>
+  2. keep-alive缓存页面
 
   ```vue
   <template>
@@ -1268,7 +1268,7 @@ Vue.component('custom-input', {
   </template>
   ```
 
-  3. <font style="color:#333333;">使用v-show复用DOM</font>
+  3. 使用v-show复用DOM
 
   ```vue
   <template>
@@ -1284,7 +1284,7 @@ Vue.component('custom-input', {
   </template>
   ```
 
-  4. <font style="color:#333333;">v-for 遍历避免同时使用 v-if</font>
+  4. v-for 遍历避免同时使用 v-if
 
   ```vue
   <template>
@@ -1308,7 +1308,7 @@ Vue.component('custom-input', {
   </script>
   ```
 
-  5. <font style="color:#333333;">长列表性能优化</font>
+  5. 长列表性能优化
 
   ```vue
   // 如果列表是纯粹的数据展示，不会有任何改变，就不需要做响应化
@@ -1330,9 +1330,9 @@ Vue.component('custom-input', {
   </recycle-scroller>
   ```
 
-  6. <font style="color:#333333;">事件的销毁</font>
+  6. 事件的销毁
 
-  <font style="color:#333333;">Vue 组件销毁时，会自动解绑它的全部指令及事件监听器，但是仅限于组件本身的事件。</font>
+  Vue 组件销毁时，会自动解绑它的全部指令及事件监听器，但是仅限于组件本身的事件。
 
   ```vue
   created() {
@@ -1343,17 +1343,17 @@ Vue.component('custom-input', {
   }
   ```
 
-  7. <font style="color:#333333;">图片懒加载</font>
+  7. 图片懒加载
 
-  <font style="color:#333333;">对于图片过多的页面，为了加速页面加载速度，所以很多时候我们需要将页面内未出现在可视区域内的图片先不做加载， 等到滚动到可视区域后再去加载。</font>
+  对于图片过多的页面，为了加速页面加载速度，所以很多时候我们需要将页面内未出现在可视区域内的图片先不做加载， 等到滚动到可视区域后再去加载。
 
   ```vue
   <img v-lazy="/static/img/1.png">
   ```
 
-  8. <font style="color:#333333;">第三方插件按需引入</font>
+  8. 第三方插件按需引入
 
-  <font style="color:#333333;">像element-ui这样的第三方组件库可以按需引入避免体积太大。</font>
+  像element-ui这样的第三方组件库可以按需引入避免体积太大。
 
   ```vue
   import Vue from 'vue';
@@ -1363,7 +1363,7 @@ Vue.component('custom-input', {
   Vue.use(Button) Vue.use(Select)
   ```
 
-  9. <font style="color:#333333;">无状态的组件标记为函数式组件</font>
+  9. 无状态的组件标记为函数式组件
 
   ```vue
   <template functional>
@@ -1437,14 +1437,14 @@ Vue.component('custom-input', {
 
   ### 47. v-model的实现原理
 
-  <font style="color:rgb(0, 0, 0);">vue中v-model可以实现数据的双向绑定，但是为什么这个指令就可以实现数据的双向绑定呢？其实v-model是vue的一个语法糖。即利用v-model绑定数据后，既绑定了数据，又添加了一个input事件监听。</font>
+  vue中v-model可以实现数据的双向绑定，但是为什么这个指令就可以实现数据的双向绑定呢？其实v-model是vue的一个语法糖。即利用v-model绑定数据后，既绑定了数据，又添加了一个input事件监听。
 
-  <font style="color:rgb(0, 0, 0);"></font>
+  
 
-  <font style="color:rgb(0, 0, 0);">实现原理：</font>
+  实现原理：
 
-  * <font style="color:rgb(0, 0, 0);">v-bind绑定响应数据</font>
-  * <font style="color:rgb(0, 0, 0);">触发input事件并传递数据</font>
+  * v-bind绑定响应数据
+  * 触发input事件并传递数据
 
   示例：
 
@@ -1562,7 +1562,7 @@ Vue.component('custom-input', {
 
   组件通信的方式如下：
 
-  ### <font style="background-color:transparent;">（1） props  /   $emit</font>
+  ### （1） props  /   $emit
 
   父组件通过`props`向子组件传递数据，子组件通过`$emit`和父组件通信
 
@@ -2472,7 +2472,7 @@ Vue.component('custom-input', {
 
   **总结：**
 
-  <font style="color:#333333;">Vuex </font>实现了一个单向数据流，在全局拥有一个 <font style="color:#333333;">State </font>存放数据，当组件要更改 <font style="color:#333333;">State </font>中的数据时，必须通过 <font style="color:#333333;">Mutation </font>提交修改信息， <font style="color:#333333;">Mutation </font>同时提供了订阅者模式供外部插件调用获取 <font style="color:#333333;">State </font>数据的更新。而当所有异步操作(常见于调用后端接口异步获取更新数据)或批量的同步操作需要走 <font style="color:#333333;">Action </font>，但 <font style="color:#333333;">Action </font>也是无法直接修改 <font style="color:#333333;">State </font>的，还是需要通过<font style="color:#333333;">Mutation </font>来修改State的数据。最后，根据 <font style="color:#333333;">State </font>的变化，渲染到视图上。
+  Vuex 实现了一个单向数据流，在全局拥有一个 State 存放数据，当组件要更改 State 中的数据时，必须通过 Mutation 提交修改信息， Mutation 同时提供了订阅者模式供外部插件调用获取 State 数据的更新。而当所有异步操作(常见于调用后端接口异步获取更新数据)或批量的同步操作需要走 Action ，但 Action 也是无法直接修改 State 的，还是需要通过Mutation 来修改State的数据。最后，根据 State 的变化，渲染到视图上。
 
   ### 2. Vuex中action和mutation的区别
 
@@ -2812,7 +2812,7 @@ Vue.component('custom-input', {
 
   在diff中，只对同层的子节点进行比较，放弃跨级的节点比较，使得时间复杂从O(n<sup>3</sup>)降低值O(n)，也就是说，只有当新旧children都为多个子节点时才需要用核心的Diff算法进行同层级比较。
 
-  ### <font style="background-color:transparent;">6. Vue中key的作用</font>
+  ### 6. Vue中key的作用
 
   vue 中 key 值的作用可以分为两种情况来考虑：
 

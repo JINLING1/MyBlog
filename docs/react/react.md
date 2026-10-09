@@ -218,7 +218,7 @@ React 创建 SyntheticEvent，包装原生事件
 
 简言之，HOC是一种组件的设计模式，HOC接受一个组件和额外的参数（如果需要），返回一个新的组件。HOC 是纯函数，没有副作用。
 
-```javascript
+```jsx
 // hoc的定义
 function withSubscription(WrappedComponent, selectData) {
   return class extends React.Component {
@@ -253,7 +253,7 @@ HOC的优缺点∶
 
 具有render prop 的组件接受一个返回React元素的函数，将render的渲染逻辑注入到组件内部。在这里，"render"的命名可以是任何其他有效的标识符。
 
-```javascript
+```jsx
 // DataProvider组件内部的渲染逻辑如下
 class DataProvider extends React.Components {
      state = {
@@ -288,7 +288,7 @@ class DataProvider extends React.Components {
 
 > Hook是 React 16.8 的新增特性。它可以让你在不编写 class 的情况下使用 state 以及其他的 React 特性。通过自定义hook，可以复用代码逻辑。
 
-```javascript
+```jsx
 // 自定义一个获取订阅数据的hook
 function useSubscription() {
   const data = DataSource.getComments();
@@ -354,7 +354,7 @@ React 通过Fiber 架构，让这个执行过程变成可被中断。它将复�
 
 高阶组件（HOC）就是一个函数，且该函数接受一个组件作为参数，并返回一个新的组件，它只是一种组件的设计模式，这种设计模式是由react自身的组合性质必然产生的。我们将它们称为纯组件，因为它们可以接受任何动态提供的子组件，但它们不会修改或复制其输入组件中的任何行为。
 
-```javascript
+```jsx
 // hoc的定义
 function withSubscription(WrappedComponent, selectData) {
   return class extends React.Component {
@@ -392,7 +392,7 @@ const BlogPostWithSubscription = withSubscription(BlogPost,
 
 * **权限控制：**利用高阶组件的 **条件渲染 **特性可以对页面进行权限控制，权限控制一般分为两个维度：页面级别和 页面元素级别
 
-```javascript
+```jsx
 function withAdminAuth(WrappedComponent) {
   return class extends React.Component {
     state = { isAdmin: false }
@@ -414,7 +414,7 @@ export default withAdminAuth(PageA);
 
 * **组件渲染性能追踪：**用**反向继承**实现，计算被包裹组件的渲染时间
 
-```javascript
+```jsx
 function withTiming(WrappedComponent) {
   return class extends WrappedComponent {  // 继承被包装组件
     UNSAFE_componentWillMount() {
@@ -438,7 +438,7 @@ export default withTiming(Home);
 
 * **页面复用**
 
-```javascript
+```jsx
 const withFetching = fetching => WrappedComponent => {
     /*function withFetching(fetching) {
   		return function(WrappedComponent) {
@@ -645,7 +645,7 @@ React 判断是否重渲染，关键在于 **`shouldComponentUpdate`**。
 
 > React 中的一个常见模式是一个组件返回多个元素。Fragments 允许你将子列表分组，而无需向 DOM 添加额外节点。
 
-```javascript
+```jsx
 import React, { Component, Fragment } from 'react'
 
 // 一般形式
@@ -676,7 +676,7 @@ render() {
 
 #### **类组件用 `React.createRef()`：**
 
-```javascript
+```jsx
 class MyComponent extends React.Component {
   constructor(props) {
     super(props)
@@ -691,7 +691,7 @@ class MyComponent extends React.Component {
 
 #### **函数组件用 `useRef`：**
 
-```javascript
+```jsx
 function MyComponent() {
   const myRef = useRef(null)
   return <div ref={myRef} />
@@ -701,7 +701,7 @@ function MyComponent() {
 
 #### **回调 ref（函数格式）：**
 
-```javascript
+```jsx
 <p ref={ele => this.info = ele}></p>
 ```
 
@@ -713,7 +713,7 @@ ref 接收一个函数，参数就是对应的节点实例。
 - 用在**类组件**上 → `current` 是组件实例
 - 用在**函数组件**上直接写 ref **不生效**（函数组件没有实例），需用 `React.forwardRef` 转发
 
-```javascript
+```jsx
 const FancyButton = React.forwardRef((props, ref) => (
   <button ref={ref}>{props.children}</button>
 ))
@@ -746,7 +746,7 @@ ReactDOM.createPortal(child, container);
 
 一般情况下，组件的render函数返回的元素会被挂载在它的上级组件上：
 
-```javascript
+```jsx
 import DemoComponent from './DemoComponent';
 
 function Parent() {
@@ -908,7 +908,7 @@ Refs 提供了一种方式，用于访问在 render 方法中创建的 React 元
 Refs 是使用 `React.createRef()` 方法创建的，他通过 `ref` 属性附加到 React 元素上。
 类组件:要在整个组件中使用 Refs，需要将 `ref` 在构造函数中分配给其实例属性：
 
-```javascript
+```jsx
 class MyComponent extends React.Component {
   constructor(props) {
     super(props)
@@ -993,7 +993,7 @@ React.forwardRef 会创建一个React组件，这个组件能够将其接受的 
 
 调用 `setState` / `setCount` 时，React 不会立即改 state，而是生成一个**更新对象**放入组件的更新队列（`updateQueue`）：
 
-```javascript
+```jsx
 {
   payload: { count: 1 },   // 这次更新要应用的内容
   callback: callback,       // 可选回调
@@ -1003,7 +1003,7 @@ React.forwardRef 会创建一个React组件，这个组件能够将其接受的 
 
 `payload` 就是你传入的参数，有两种形式：
 
-```javascript
+```jsx
 setState({ count: 1 })                       // payload 是对象
 setState(prev => ({ count: prev.count + 1 })) // payload 是函数
 ```
@@ -1021,7 +1021,7 @@ React 判断当前是否处于**批量更新上下文**（可理解为“一次�
 
 - **payload 是对象**：存的是固定值，同一属性被多次设置时，**后者覆盖前者**，所以“只有最后一次生效”。
 
-```javascript
+```jsx
 this.setState({ count: this.state.count + 1 }) // count=0，算出 1
 this.setState({ count: this.state.count + 1 }) // state 还是 0，还是 1
 this.setState({ count: this.state.count + 1 }) // 还是 1
@@ -1030,7 +1030,7 @@ this.setState({ count: this.state.count + 1 }) // 还是 1
 
 - **payload 是函数**：函数不会提前执行，而是排队，在合并阶段**依次执行**，前一个的返回值作为后一个的参数，所以全部参与计算。
 
-```javascript
+```jsx
 this.setState(prev => ({ count: prev.count + 1 })) // prev=0，返回 1
 this.setState(prev => ({ count: prev.count + 1 })) // prev=1，返回 2
 this.setState(prev => ({ count: prev.count + 1 })) // prev=2，返回 3
@@ -1067,7 +1067,7 @@ this.setState(prev => ({ count: prev.count + 1 })) // prev=2，返回 3
 
 **React 18 起**，使用 `createRoot` 后，**所有场景默认自动批处理**，无论更新来自合成事件、生命周期，还是 `setTimeout`、Promise、原生事件，都会合并为一次渲染。
 
-```javascript
+```jsx
 // React 18 中，以下只会触发一次渲染
 setTimeout(() => {
   setCount(c => c + 1);
@@ -1081,7 +1081,7 @@ setTimeout(() => {
 
 `setState` 的“异步”表现，本质是因为 **state 在每次渲染中是一个固定的快照**。事件处理函数中拿到的 state 始终是**那次渲染时的值**，不会因为调用了 `setState` 而立即改变。
 
-```javascript
+```jsx
 // 点击后 count 只 +1，不是 +3
 setCount(count + 1); // count 是 0，所以是 setCount(1)
 setCount(count + 1); // count 还是 0，还是 setCount(1)
@@ -1090,7 +1090,7 @@ setCount(count + 1); // count 还是 0，还是 setCount(1)
 
 要基于前一个值连续更新，必须用**更新函数**：
 
-```javascript
+```jsx
 setCount(n => n + 1); // n 依次为 0 → 1 → 2，最终 3
 ```
 
@@ -1154,7 +1154,7 @@ reducer 接收当前 state 和 action，返回新的 state，存回 store。stor
 
 它返回一个对象，对象的每个字段会成为被包裹组件的 props。
 
-```javascript
+```jsx
 const mapStateToProps = (state, ownProps) => ({
   active: ownProps.filter === state.visibilityFilter  //{active:true}或{active:false}
 })
@@ -1164,7 +1164,7 @@ const mapStateToProps = (state, ownProps) => ({
 
 `mapDispatchToProps(dispatch, ownProps)` 返回一个对象，里面是派发 action 的方法，同样会作为 props 传给组件。
 
-```javascript
+```jsx
 const mapDispatchToProps = (dispatch, ownProps) => ({
   setFilter: () => dispatch(setVisibilityFilter(ownProps.filter))
 })
@@ -1178,13 +1178,13 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
 
 包装组件在 render 中把合并后的 props 传给原组件：
 
-```javascript
+```jsx
 <WrappedComponent {...this.state.allProps} />
 ```
 
 #### 完整示例
 
-```javascript
+```jsx
 import { connect } from 'react-redux'
 import { setVisibilityFilter } from '@/reducers/Todo/actions'
 import Link from '@/containers/Todo/components/Link'
@@ -1209,7 +1209,7 @@ export default connect(
 
 #### connect 的高阶组件实现
 
-```javascript
+```jsx
 import React from 'react'
 import PropTypes from 'prop-types'
 
@@ -1271,7 +1271,7 @@ export const connect = (mapStateToProps, mapDispatchToProps) => (WrappedComponen
 
 react-redux 现在推荐用 Hooks，不再需要 `connect` 包装：
 
-```javascript
+```jsx
 import { useSelector, useDispatch } from 'react-redux'
 
 function Link({ filter }) {
@@ -1328,7 +1328,7 @@ state的主要作用是用于组件保存、控制以及修改自己的状态，
 
 在 props 变化时把新 props 映射到 state，返回对象更新、返回 null 不更新
 
-```javascript
+```jsx
 static getDerivedStateFromProps(nextProps, prevState) { //静态函数，不需访问组件实例
     const {type} = nextProps; //从props取出某个字段值
     // 当传入的type发生变化的时候，更新state
@@ -1390,7 +1390,7 @@ constructor中通常只做两件事：
 * 初始化组件的 state
 * 给事件处理方法绑定 this
 
-```javascript
+```jsx
 constructor(props) {
   super(props);
   // 不要在构造函数中调用 setState，可以直接给 state 设置初始值
@@ -1401,7 +1401,7 @@ constructor(props) {
 
 ##### （2）getDerivedStateFromProps
 
-```javascript
+```jsx
 static getDerivedStateFromProps(props, state)
 ```
 
@@ -1409,7 +1409,7 @@ static getDerivedStateFromProps(props, state)
 
 该函数会在装载时，接收到新的 `props` 或者调用了 `setState` 和 `forceUpdate` 时被调用。如当接收到新的属性想修改 `state` ，就可以使用。
 
-```javascript
+```jsx
 // 当 props.counter 变化时，赋值给 state 
 class App extends React.Component {
   constructor(props) {
@@ -1445,7 +1445,7 @@ class App extends React.Component {
 现在可以显式传入 `counter` ，但是这里有个问题，如果想要通过点击实现 `state.counter` 的增加，但这时会发现值不会发生任何变化，一直保持 `props` 传进来的值。
 这是由于在 React 16.4^ 的版本中 `setState` 和 `forceUpdate` 也会触发这个生命周期，所以当组件内部 `state` 变化后，就会重新走这个方法，同时会把 `state` 值赋值为 `props` 的值。因此需要多加一个字段来记录之前的 `props` 值，这样就会解决上述问题。具体如下：
 
-```javascript
+```jsx
 // 这里只列出需要变化的地方
 class App extends React.Component {
   constructor(props) {
@@ -1548,7 +1548,7 @@ class App extends React.Component  {
 
 ##### （1）shouldComponentUpdate
 
-```javascript
+```jsx
 shouldComponentUpdate(nextProps, nextState)
 ```
 
@@ -1556,7 +1556,7 @@ shouldComponentUpdate(nextProps, nextState)
 
 * **setState 函数在任何情况下都会导致组件重新渲染吗？例如下面这种情况：**
 
-```javascript
+```jsx
 this.setState({number: this.state.number})
 ```
 
@@ -1572,7 +1572,7 @@ this.setState({number: this.state.number})
 
 ##### （2）getSnapshotBeforeUpdate
 
-```javascript
+```jsx
 getSnapshotBeforeUpdate(prevProps, prevState)
 ```
 
@@ -1585,7 +1585,7 @@ componentDidUpdate() 会在更新后会被立即调用，首次渲染不会执�
 * 当组件更新后，对 DOM 进行操作；
 * 比较更新前后的 props，决定是否发请求
 
-```javascript
+```jsx
 componentDidUpdate(prevProps, prevState, snapshot){}
 ```
 
@@ -1740,7 +1740,7 @@ function Child(props) {
 * 使用props，利用中间组件层层传递
 * 使用context，context相当于一个大容器，可以把要通信的内容放在这个容器中，这样不管嵌套多深，都可以随意取用，对于**跨越多层的全局数据**可以使用context实现。
 
-```javascript
+```jsx
 //函数组件写法
 import { createContext, useContext } from 'react'
 
@@ -2130,7 +2130,7 @@ Redux 是一个用来管理全局状态的 JavaScript 工具
 
 **2. 组件读取 state：useSelector**
 
-```javascript
+```jsx
 const text = useSelector(state => state.text)
 ```
 
@@ -2138,7 +2138,7 @@ const text = useSelector(state => state.text)
 
 **3. 组件派发 action：useDispatch**
 
-```javascript
+```jsx
 const dispatch = useDispatch()
 dispatch({ type: 'ADD' })
 ```
@@ -2151,7 +2151,7 @@ dispatch({ type: 'ADD' })
 
 #### 完整示例
 
-```javascript
+```jsx
 import { createStore } from 'redux'
 import { Provider, useSelector, useDispatch } from 'react-redux'
 
@@ -2204,7 +2204,7 @@ Redux 的中间件提供的是位于 action 被发起之后，到达 reducer 之
 
 applyMiddleware源码：
 
-```javascript
+```jsx
 export default function applyMiddleware(...middlewares) {
     return createStore => (...args) => {
         // 利用传入的createStore和reducer和创建一个store
@@ -2243,7 +2243,7 @@ redux-saga是一个管理redux应用异步操作的中间件，用于代替 redu
 
 可以让多个 saga 任务并行被 fork 执行。
 
-```javascript
+```jsx
 import {
     fork,
     take
@@ -2263,7 +2263,7 @@ takeLatest 不允许多个 saga 任务并行地执行。一旦接收到新的发
 
 在处理 AJAX 请求的时候，如果只希望获取最后那个请求的响应， takeLatest 就会非常有用。
 
-```javascript
+```jsx
 import {
     cancel,
     fork,
@@ -2313,7 +2313,7 @@ React-Hooks 是 React 团队在 React 组件开发实践中，逐渐认知到的
 
 **（1）类组件：**所谓类组件，就是基于 ES6 Class 这种写法，通过继承 React.Component 得来的 React 组件。以下是一个类组件：
 
-```javascript
+```jsx
 class DemoClass extends React.Component {
   state = {
     text: ""
@@ -2345,7 +2345,7 @@ class DemoClass extends React.Component {
 
 **（2）函数组件**：函数组件就是以函数的形态存在的 React 组件。早期并没有 React-Hooks，函数组件内部无法定义和维护 state，因此它还有一个别名叫“无状态组件”。以下是一个函数组件：
 
-```javascript
+```jsx
 function DemoFunction(props) {
   const { text } = props
   return (
@@ -2385,7 +2385,7 @@ React-Hooks 是一套能够使函数组件更强大、更灵活的“钩子”�
 
 useState 的用法：
 
-```javascript
+```jsx
 const [count, setCount] = useState(0)
 ```
 
@@ -2395,7 +2395,7 @@ const [count, setCount] = useState(0)
 
 ##### 数组的解构赋值
 
-```javascript
+```jsx
 const foo = [1, 2, 3];
 const [one, two, three] = foo;
 console.log(one);	// 1
@@ -2405,7 +2405,7 @@ console.log(three);	// 3
 
 ##### 对象的解构赋值
 
-```javascript
+```jsx
 const user = {
   id: 888,
   name: "xiaoxin"
@@ -2422,7 +2422,7 @@ console.log(name);	// "xiaoxin"
 
 下面来看看如果 useState 返回对象的情况：
 
-```javascript
+```jsx
 // 第一次使用
 const { state, setState } = useState(false);
 // 第二次使用
@@ -2500,7 +2500,7 @@ React Hooks 的限制主要有两条：
 
 使用push直接更改数组无法获取到新值，应该采用析构方式，但是在class里面不会有这个问题。代码示例：
 
-```javascript
+```jsx
 function Indicatorfilter() {
   let [num,setNums] = useState([0,1,2,3])
   const test = () => {
@@ -2561,7 +2561,7 @@ class Indicatorfilter extends React.Component<any,any>{
 
 TableDeail是一个公共组件，在调用它的父组件里面，我们通过set改变columns的值，以为传递给TableDeail 的 columns是最新的值，所以tabColumn每次也是最新的值，但是实际tabColumn是最开始的值，不会随着columns的更新而更新：
 
-```javascript
+```jsx
 const TableDeail = ({
     columns,
 }:TableData) => {
@@ -2598,13 +2598,13 @@ const TableDeail = ({
 
 * `constructor`：函数组件不需要构造函数，可以通过调用 <code>**useState**** 来初始化 state**</code>。如果计算的代价比较昂贵，也可以传一个函数给 `useState`。
 
-```javascript
+```jsx
 const [num, UpdateNum] = useState(0)
 ```
 
 * `getDerivedStateFromProps`：一般情况下，我们不需要使用它，可以在**渲染过程中更新 state**，以达到实现 `getDerivedStateFromProps` 的目的。
 
-```javascript
+```jsx
 function ScrollView({row}) {
   let [isScrollingDown, setIsScrollingDown] = useState(false);
   let [prevRow, setPrevRow] = useState(null);
@@ -2621,7 +2621,7 @@ React 会立即退出第一次渲染并用更新后的 state 重新运行组件�
 
 * `shouldComponentUpdate`：可以用 <code>**React.memo**</code> 包裹一个组件来对它的 `props` 进行浅比较
 
-```javascript
+```jsx
 const Button = React.memo((props) => {
   // 具体的组件
 });
@@ -2632,7 +2632,7 @@ const Button = React.memo((props) => {
 * `render`：这是函数组件体本身。
 * `componentDidMount`, `componentDidUpdate`： `useLayoutEffect` 与它们两的调用阶段是一样的。但是，我们推荐你**一开始先用 useEffect**，只有当它出问题的时候再尝试使用 `useLayoutEffect`。`useEffect` 可以表达所有这些的组合。
 
-```javascript
+```jsx
 // componentDidMount
 useEffect(()=>{
   // 需要在 componentDidMount 执行的内容
@@ -2651,7 +2651,7 @@ useEffect(() => {
 
 * `componentWillUnmount`：相当于 `useEffect `里面返回的 `cleanup` 函数
 
-```javascript
+```jsx
 // componentDidMount/componentWillUnmount
 useEffect(()=>{
   // 需要在 componentDidMount 执行的内容
@@ -2718,7 +2718,7 @@ Virtual DOM本质上是JavaScript的对象，它可以很方便的跨平台操�
 
 一个简单的例子：
 
-```javascript
+```jsx
 import React from 'react'
 export default class ExampleComponent extends React.Component {
   render() {
@@ -2732,7 +2732,7 @@ export default class ExampleComponent extends React.Component {
 
 这里，首先假定 ExampleComponent 可见，然后再改变它的状态，让它不可见 。映射为真实的 DOM 操作是这样的，React 会创建一个 div 节点。
 
-```javascript
+```jsx
 <div class="visible">visbile</div>
 ```
 
@@ -2799,7 +2799,7 @@ Vue 的整体 diff 策略与 React 对齐，虽然缺乏时间切片能力，但
 
 使用displayName命名组件：
 
-```javascript
+```jsx
 export default React.createClass({
   displayName: 'TodoApp',
   // ...
@@ -2808,7 +2808,7 @@ export default React.createClass({
 
 React推荐的方法：
 
-```javascript
+```jsx
 export default class TodoApp extends React.Component {
   // ...
 }
@@ -2859,7 +2859,7 @@ hooks很好的解决了上述问题，hooks提供了很多方法
 
 ### 3. react 实现一个全局的 dialog
 
-```javascript
+```jsx
 import React, { Component } from 'react';
 import { is, fromJS } from 'immutable';
 import ReactDOM from 'react-dom';
@@ -2947,7 +2947,7 @@ let Box = ReactD
 
 子类：
 
-```javascript
+```jsx
 //子类jsx
 import React, { Component } from 'react';
 class Child extends Component {
@@ -2989,7 +2989,7 @@ css：
 
 封装数据持久化组件：
 
-```javascript
+```jsx
 】let storage={
     // 增加
     set(key, value){
@@ -3013,13 +3013,13 @@ export default Storage;
 
 **（1）首先要安装redux-persist：**
 
-```javascript
+```jsx
 npm i redux-persist
 ```
 
 **（2）对于reducer和action的处理不变，只需修改store的生成代码，修改如下：**
 
-```javascript
+```jsx
 import {createStore} from 'redux'
 import reducers from '../reducers/index'
 import {persistStore, persistReducer} from 'redux-persist';
@@ -3038,7 +3038,7 @@ export default store
 
 **（3）在index.js中，将PersistGate标签作为网页内容的父标签：**
 
-```javascript
+```jsx
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux'
@@ -3115,7 +3115,7 @@ react可以通过高阶组件（Higher Order Components-- HOC）来扩展，而v
 
 * 直接创建一个具有 typescript 的 Create React App 项目：
 
-```javascript
+```jsx
  npx create-react-app demo --typescript
 ```
 
@@ -3123,7 +3123,7 @@ react可以通过高阶组件（Higher Order Components-- HOC）来扩展，而v
 
 * <font style="background-color:transparent;">通过命令将 typescript 引入项目：</font>
 
-```javascript
+```jsx
 npm install --save typescript @types/node @types/react @types/react-dom @types/jest
 ```
 
@@ -3162,7 +3162,7 @@ React 还可以使用 Node 进行服务器渲染，或使用 React Native 开发
 
 在React中，当涉及组件嵌套，在父组件中使用`props.children`把所有子组件显示出来。如下：
 
-```javascript
+```jsx
 function ParentComponent(props){
 	return (
 		<div>
@@ -3178,7 +3178,7 @@ function ParentComponent(props){
 
 首先是子组件：
 
-```javascript
+```jsx
 //子组件
 function RadioOption(props) {
   return (
@@ -3192,7 +3192,7 @@ function RadioOption(props) {
 
 然后是父组件，不仅需要把它所有的子组件显示出来，还需要为每个子组件赋上name属性和值：
 
-```javascript
+```jsx
 //父组件用,props是指父组件的props
 function renderChildren(props) {
     
@@ -3237,7 +3237,7 @@ React的状态提升就是用户对子组件操作，子组件不改变自己的
 
 一个简单的例子，父组件中有两个input子组件，如果想在第一个输入框输入数据，来改变第二个输入框的值，这就需要用到状态提升。
 
-```javascript
+```jsx
 class Father extends React.Component {
     constructor(props) {
         super(props)
@@ -3302,7 +3302,7 @@ ReactDOM.render(
 
 getInitialState是ES5中的方法，如果使用createClass方法创建一个Component组件，可以自动调用它的getInitialState方法来获取初始化的State对象，
 
-```javascript
+```jsx
 var APP = React.creatClass ({
   getInitialState() {
     return { 
@@ -3315,7 +3315,7 @@ var APP = React.creatClass ({
 
 React在ES6的实现中去掉了getInitialState这个hook函数，规定state在constructor中实现，如下：
 
-```javascript
+```jsx
 Class App extends React.Component{
     constructor(props){
       super(props);
@@ -3332,7 +3332,7 @@ Class App extends React.Component{
 
 可以为应用程序的任何部分启用严格模式。例如：
 
-```javascript
+```jsx
 import React from 'react';
 function ExampleApplication() {
   return (
@@ -3364,7 +3364,7 @@ function ExampleApplication() {
 
 **（1）遍历数组：map && forEach**
 
-```javascript
+```jsx
 import React from 'react';
 
 class App extends React.Component {
@@ -3400,7 +3400,7 @@ class App extends React.Component {
 
 **（2）遍历对象：map && for in**
 
-```javascript
+```jsx
 class App extends React.Component {
   render() {
     let obj = {
@@ -3471,7 +3471,7 @@ React 并不强制要求使用 JSX。当不想在构建环境中配置有关 JSX
 
 例如，用 JSX 编写的代码：
 
-```javascript
+```jsx
 class Hello extends React.Component {
   render() {
     return <div>Hello {this.props.toWhat}</div>;
@@ -3485,7 +3485,7 @@ ReactDOM.render(
 
 可以编写为不使用 JSX 的代码：
 
-```javascript
+```jsx
 class Hello extends React.Component {
   render() {
     return React.createElement('div', null, `Hello ${this.props.toWhat}`);
@@ -3575,7 +3575,7 @@ JSX 是一个 JavaScript 的语法扩展，或者说是一个类似于 XML 的 E
 
 其实 React 本身并不强制使用 JSX。在没有 JSX 的时候，React 实现一个组件依赖于使用 React.createElement 函数。代码如下：
 
-```javascript
+```jsx
 class Hello extends React.Component {
   render() {
     return React.createElement(
@@ -3593,7 +3593,7 @@ ReactDOM.render(
 
 而 JSX 更像是一种语法糖，通过类似 XML 的描述方式，描写函数对象。在采用 JSX 之后，这段代码会这样写：
 
-```javascript
+```jsx
 class Hello extends React.Component {
   render() {
     return <div>Hello {this.props.toWhat}</div>;
@@ -3621,7 +3621,7 @@ React 团队并不想引入 JavaScript 本身以外的开发体系。而是希�
 
 使用了装饰模式，高阶组件的运用：
 
-```javascript
+```jsx
 function withWindowWidth(BaseComponent) {
   class DerivedClass extends React.Component {
     state = {
@@ -3652,7 +3652,7 @@ export default withWindowWidth(MyComponent);
 
 装饰模式的特点是不需要改变 被装饰对象 本身，而只是在外面套一个外壳接口。JavaScript 目前已经有了原生装饰器的提案，其用法如下：
 
-```javascript
+```jsx
 @testable
    class MyTestableClass {
 }

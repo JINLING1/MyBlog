@@ -11,6 +11,7 @@ comments: false
 ## 从这里开始
 
 - [可复用的 AI 协作工作流](/ai-productivity/workflow)
+- [Skills的最佳实践](/ai-productivity/skills)
 
 ## 计划整理
 

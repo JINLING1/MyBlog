@@ -1,7 +1,7 @@
 ---
 title: JavaScript闭包
 description: 待补充
-date: 2026-10-01
+date: 2026-10-09
 tags:
   - JavaScript
 comments: true

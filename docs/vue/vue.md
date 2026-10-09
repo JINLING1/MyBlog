@@ -205,7 +205,7 @@ slot又名插槽，是Vue的内容分发机制，组件内部的模板引擎使�
 ```javascript
 <keep-alive>
 	<router-view v-if="$route.meta.keepAlive"></router-view>
-</kepp-alive>
+</keep-alive>
 ```
 
 **router.js**
@@ -1220,7 +1220,7 @@ Vue.component('custom-input', {
   * ⼀个⼤的模块中model也会很⼤，虽然使⽤⽅便了也很容易保证了数据的⼀致性，当时⻓期持有，不释放内存就造成了花费更多的内存
   * 对于⼤型的图形应⽤程序，视图状态较多，ViewModel的构建和维护的成本都会⽐较⾼。
 
-  ### 43. **v-i&#x66;****和****&#x76;-for哪个优先级更高？如果同时出现，应如何优化？**
+  ### 43. **v-if和v-for哪个优先级更高？如果同时出现，应如何优化？**
 
   v-for优先于v-if被解析，如果同时出现，每次渲染都会**先执行循环再判断条件**，无论如何循环都不可避免，浪费了性能。
 

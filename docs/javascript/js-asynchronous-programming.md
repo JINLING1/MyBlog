@@ -89,7 +89,7 @@ async function func1() {
 console.log(func1())
 ```
 
-![1604021075237-8249a8df-3a28-4bca-9f22-02923aba8618.png](assets/1604021075237-8249a8df-3a28-4bca-9f22-02923aba8618-545227.png)
+![1604021075237-8249a8df-3a28-4bca-9f22-02923aba8618.png](../public/images/js/1604021075237-8249a8df-3a28-4bca-9f22-02923aba8618-545227.png)
 
 func1的运行结果其实就是一个Promise对象。因此也可以使用then来处理后续逻辑。
 
@@ -461,7 +461,7 @@ let result = testAsy();
 console.log(result)
 ```
 
-![1605099411873-d2eac25a-5d8c-4586-bc36-769bce79010e.png](assets/1605099411873-d2eac25a-5d8c-4586-bc36-769bce79010e-422414.png)
+![1605099411873-d2eac25a-5d8c-4586-bc36-769bce79010e.png](../public/images/js/1605099411873-d2eac25a-5d8c-4586-bc36-769bce79010e-422414.png)
 
 所以，async 函数返回的是一个 Promise 对象。async 函数（包含函数语句、函数表达式、Lambda表达式）会返回一个 Promise 对象，如果在函数中 `return` 一个直接量，async 会把这个直接量通过 `Promise.resolve()` 封装成 Promise 对象。
 

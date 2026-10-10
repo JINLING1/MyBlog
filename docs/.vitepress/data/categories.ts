@@ -33,6 +33,15 @@ export const categories: BlogCategory[] = [
     articles: [{ text: '闭包：从词法作用域开始理解', link: '/javascript/closure' }]
   },
   {
+    slug: 'typescript',
+    label: 'TypeScript',
+    shortLabel: 'TypeScript',
+    description: '记录类型系统、工程实践与更可靠的 JavaScript 开发经验。',
+    icon: 'TS',
+    accent: '#3178c6',
+    articles: [{ text: 'TypeScript 核心知识点', link: '/typescript/ts' }]
+  },
+  {
     slug: 'vue',
     label: 'Vue',
     shortLabel: 'Vue',

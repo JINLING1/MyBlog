@@ -6,6 +6,7 @@ import HomeCategories from './components/HomeCategories.vue'
 import BrandWordmark from './components/BrandWordmark.vue'
 import ArticleMeta from './components/ArticleMeta.vue'
 import GiscusComments from './components/GiscusComments.vue'
+import ArticleOutlineSidebar from './components/ArticleOutlineSidebar.vue'
 import './styles.css'
 
 const PwaUpdateToast = defineClientComponent(
@@ -17,6 +18,7 @@ export default {
   Layout: () =>
     h(DefaultTheme.Layout, null, {
       'home-hero-info-before': () => h(BrandWordmark),
+      'sidebar-nav-before': () => h(ArticleOutlineSidebar),
       'doc-before': () => h(ArticleMeta),
       'doc-after': () => h(GiscusComments),
       'layout-bottom': () => h(PwaUpdateToast)

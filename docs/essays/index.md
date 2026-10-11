@@ -10,7 +10,7 @@ comments: false
 
 ## 从这里开始
 
-- [为什么建立自己的知识花园](/essays/knowledge-garden)
+- [为什么建立自己的知识库](/essays/knowledge-garden)
 
 ## 计划整理
 

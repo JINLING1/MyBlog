@@ -21,7 +21,10 @@ export const categories: BlogCategory[] = [
     description: '从语义化结构到现代布局，构建可靠、易维护的界面。',
     icon: '</>',
     accent: '#38bdf8',
-    articles: [{ text: 'HTML 高频考点', link: '/html-css/html' }]
+    articles: [
+      { text: 'CSS', link: '/html-css/css' },
+      { text: 'HTML', link: '/html-css/html' }
+    ]
   },
   {
     slug: 'javascript',
@@ -30,7 +33,15 @@ export const categories: BlogCategory[] = [
     description: '梳理语言核心、运行机制与常见工程实践。',
     icon: 'JS',
     accent: '#facc15',
-    articles: [{ text: '闭包：从词法作用域开始理解', link: '/javascript/closure' }]
+    articles: [
+      { text: 'JavaScript 异步编程', link: '/javascript/js-asynchronous-programming' },
+      { text: 'JavaScript 基础', link: '/javascript/js-basic' },
+      { text: 'JavaScript 闭包', link: '/javascript/js-closure' },
+      { text: 'JavaScript 数据类型', link: '/javascript/js-datatype' },
+      { text: 'JavaScript ES6', link: '/javascript/js-es6' },
+      { text: 'JavaScript 原型', link: '/javascript/js-prototype' },
+      { text: 'JavaScript 的 this', link: '/javascript/js-this' }
+    ]
   },
   {
     slug: 'typescript',
@@ -39,7 +50,7 @@ export const categories: BlogCategory[] = [
     description: '记录类型系统、工程实践与更可靠的 JavaScript 开发经验。',
     icon: 'TS',
     accent: '#3178c6',
-    articles: [{ text: 'TypeScript 核心知识点', link: '/typescript/ts' }]
+    articles: [{ text: 'TypeScript', link: '/typescript/ts' }]
   },
   {
     slug: 'vue',
@@ -48,7 +59,7 @@ export const categories: BlogCategory[] = [
     description: '记录 Vue 生态、响应式原理与组件设计经验。',
     icon: 'V',
     accent: '#34d399',
-    articles: [{ text: '响应式系统的最小心智模型', link: '/vue/reactivity' }]
+    articles: [{ text: 'Vue', link: '/vue/vue' }]
   },
   {
     slug: 'react',
@@ -57,7 +68,7 @@ export const categories: BlogCategory[] = [
     description: '理解组件、Hooks、状态管理与渲染模型。',
     icon: 'R',
     accent: '#22d3ee',
-    articles: [{ text: 'Hooks 的职责与使用边界', link: '/react/hooks' }]
+    articles: [{ text: 'React', link: '/react/react' }]
   },
   {
     slug: 'ai-productivity',
@@ -66,7 +77,10 @@ export const categories: BlogCategory[] = [
     description: '把 AI 融入开发、研究与知识整理的工作流。',
     icon: 'AI',
     accent: '#a78bfa',
-    articles: [{ text: '可复用的 AI 协作工作流', link: '/ai-productivity/workflow' }]
+    articles: [
+      { text: 'skills 的最佳实践', link: '/ai-productivity/skills' },
+      { text: '可复用的 AI 协作工作流', link: '/ai-productivity/workflow' }
+    ]
   },
   {
     slug: 'it-basics',
@@ -75,7 +89,7 @@ export const categories: BlogCategory[] = [
     description: '补齐网络、系统、Git 与计算机基础知识。',
     icon: '01',
     accent: '#fb7185',
-    articles: [{ text: '一次网页访问背后的网络链路', link: '/it-basics/web-request' }]
+    articles: [{ text: '基础知识', link: '/it-basics/web-request' }]
   },
   {
     slug: 'essays',
@@ -84,7 +98,7 @@ export const categories: BlogCategory[] = [
     description: '记录学习、创作和长期成长过程中的思考。',
     icon: '✦',
     accent: '#fb923c',
-    articles: [{ text: '为什么建立自己的知识花园', link: '/essays/knowledge-garden' }]
+    articles: [{ text: '为什么建立自己的知识库', link: '/essays/knowledge-garden' }]
   }
 ]
 
@@ -97,6 +111,7 @@ export const categorySidebar = Object.fromEntries(
     [
       {
         text: category.label,
+        collapsed: true,
         items: [
           { text: '栏目概览', link: `/${category.slug}/` },
           ...category.articles

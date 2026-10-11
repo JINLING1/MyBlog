@@ -1,10 +1,10 @@
 ---
 title: JavaScript异步编程
 description: 待补充
-date: 2026-10-01
+date: 2026-10-11
 tags:
   - JavaScript
-  - datatype
+  - asynchronous-programming 
 comments: true
 
 
@@ -12,18 +12,154 @@ comments: true
 
 # 异步编程
 
+WHY?
+
+js是单线程的，同一时间只能做一件事，而有些操作很慢，会导致一个操作卡住整个程序
+
+异步的思路是：**把“慢操作”交给别的机制去处理，主线程继续往下走，结果回来了再处理。**
+
+
+
 ## 1. 异步编程的实现方式？
 
-JavaScript中的异步机制可以分为以下几种：
+JavaScript中常见的实现异步的方式可以分为以下六种：
 
-* **回调函数 **的方式，使用回调函数的方式有一个缺点是，多个回调函数嵌套的时候会造成回调函数地狱，上下两层的回调函数间的代码耦合度太高，不利于代码的可维护。
-* **Promise** 的方式，使用 Promise 的方式可以将嵌套的回调函数作为链式调用。但是使用这种方法，有时会造成多个 then 的链式调用，可能会造成代码的语义不够明确。
-* **generator **的方式，它可以在函数的执行过程中，将函数的执行权转移出去，在函数外部还可以将执行权转移回来。当遇到异步函数执行的时候，将函数执行权转移出去，当异步函数执行完毕时再将执行权给转移回来。因此在 generator 内部对于异步操作的方式，可以以同步的顺序来书写。使用这种方式需要考虑的问题是何时将函数的控制权转移回来，因此需要有一个自动执行 generator 的机制，比如说 co 模块等方式来实现 generator 的自动执行。
-* **async 函数 **的方式，async 函数是 generator 和 promise 实现的一个自动执行的语法糖，它内部自带执行器，当函数内部执行到一个 await 语句的时候，如果语句返回一个 promise 对象，那么函数将会等待 promise 对象的状态变为 resolve 后再继续向下执行。因此可以将异步逻辑，转化为同步的顺序来书写，并且这个函数可以自动执行。
+* **回调函数 **，缺点是，多个回调函数嵌套的时候会造成回调函数地狱，上下两层的回调函数间的代码耦合度太高，不利于代码的可维护。
 
-## 2. setTimeout、Promise、Async/Await 的区别
+  > ```javascript
+  > console.log('开始')
+  > setTimeout(function callback() {
+  >   console.log('2 秒后执行')
+  > }, 2000)
+  > console.log('结束')
+  > //开始
+  > //结束
+  > //（2 秒后）2 秒后执行
+  > ```
+
+* **Promise** ，可以将嵌套的回调函数作为链式调用。但是有时会造成多个 then 的链式调用，可能会造成代码的语义不够明确。
+
+* **Generator **，Generator 是一个可以暂停和恢复的函数，用 `function*` 定义，用 `yield` 暂停，用 `next()` 恢复。遇到异步操作时，`yield` 可以把 Promise 交出去，等 Promise 完成后再通过 `next(result)` 把结果传回来，继续执行。但 Generator 不会自己跑，需要 co 之类的自动执行器。
+
+  > ```javascript
+  > function* gen() {
+  >   const user = yield getUser()
+  >   console.log('拿到用户：', user.name)
+  > 
+  >   const orders = yield getOrders(user.id)
+  >   console.log('拿到订单：', orders)
+  > 
+  >   const detail = yield getDetail(orders[0].id)
+  >   console.log('拿到详情：', detail)
+  > }
+  > 
+  > const g = gen()
+  > // 第 1 次 next：执行到第一个 yield，拿到 getUser() 的 Promise
+  > const p1 = g.next().value// getUser() 返回的 Promise
+  > p1.then(user => {
+  >     //// 把 user 传回去，继续执行到下一个 yield
+  >   const p2 = g.next(user).value//getOrders返回的 Promise
+  >   p2.then(orders => {
+  >     const p3 = g.next(orders).value
+  >     // getDetail返回的 Promise
+  >     p3.then(detail => {
+  >       // getDetail 完成，把 detail 传回去，函数执行完毕
+  >       g.next(detail)
+  >     })
+  >   })
+  > })
+  > ```
+  >
+  > 
+
+* **async/await 函数 **的方式，async / await 函数是 Promise 的语法糖，写法上借鉴了 Generator 的“暂停/恢复”机制，并自带执行器。
+  当函数内部执行到一个 await 语句的时候，如果语句的结果是一个 promise 对象，那么函数将会等待 promise 对象的状态变为 resolve 后再继续向下执行。因此可以将异步逻辑，转化为同步的顺序来书写，并且这个函数可以自动执行。
+
+  ---
+
+  *不常考* :
+
+* **事件监听** : 给某个事件绑定一个回调，事件触发时，回调被调用
+
+* **发布订阅** : 一种消息传递模式：发布者不直接把消息发给订阅者，而是发给一个调度中心，由调度中心负责把消息分发给所有订阅了该消息的订阅者。
+
+## 2.微任务和宏任务
+
+```javascript
+setTimeout(function callback() {
+  console.log('2 秒后执行')//回调
+}, 2000)//慢操作：等待2s
+```
+
+异步操作发起后，回调不会立刻执行。那它什么时候执行？由**事件循环**和**任务队列**决定
+
+### 事件循环（Event Loop）
+
+核心：不断检查主栈是否为空，空了就去取任务执行
+
+一轮事件循环 = 从“取一个宏任务”到“清空它产生的所有微任务”
+
+| 角色           | 作用         |
+| :------------- | :----------- |
+| 主栈（调用栈） | 执行同步代码 |
+| 微任务队列     | 存放微任务   |
+| 宏任务队列     | 存放宏任务   |
+
+**执行流程：**
+
+```
+1. 执行主栈里的同步代码
+2. 主栈空了
+3. 清空所有微任务
+4. 取一个宏任务执行
+5. 宏任务执行完，再清空所有微任务
+6. 再取下一个宏任务
+7. 循环往复
+```
+
+**关键：微任务优先于宏任务。每执行完一个宏任务，都要先清空微任务队列。**
+
+### 宏任务（macrotask）
+
+**常见的宏任务：**
+
+- `setTimeout`
+- `setInterval`
+- I/O 操作
+- UI 渲染
+
+**特点：**
+
+- 每轮事件循环只取**一个**宏任务执行
+- 执行完一个宏任务，会先清空微任务队列，再取下一个宏任务
+
+### 微任务（microtask）
+
+**常见的微任务：**
+
+- `Promise.then` / `catch` / `finally`
+- `queueMicrotask`
+- `MutationObserver`
+- `await` 后面的代码
+
+**特点：**
+
+- 主栈空了之后，**一次性清空所有微任务**
+- 微任务执行过程中产生的新微任务，也会在这一轮被清空
+- 微任务全部清空后，才执行下一个宏任务
+
+## 3. setTimeout、Promise、Async/Await 的区别
+
+|              | setTimeout            | Promise              | async/await      |
+| :----------- | :-------------------- | :------------------- | :--------------- |
+| 是什么       | 定时器 API            | 异步管理对象         | 语法糖           |
+| 作用         | 延迟执行回调          | 管理异步结果         | 用同步写法写异步 |
+| **回调放哪** | 宏任务队列            | 微任务队列           | 微任务队列       |
+| 执行时机     | 主栈空 + 微任务清空后 | 主栈空后，微任务阶段 | 同 Promise       |
 
 ### （1）setTimeout
+
+第二个参数x：延迟x毫秒进行；若为空，则把回调放入宏任务队列，等主栈空了再执行。
 
 ```javascript
 console.log('script start')	//1. 打印 script start
@@ -36,7 +172,13 @@ console.log('script end')	//3. 打印 script end
 
 ### （2）Promise
 
-Promise本身是**同步的立即执行函数**， 当在executor中执行resolve或者reject的时候, 此时是异步操作， 会先执行then/catch等，当主栈完成后，才会去调用resolve/reject中存放的方法执行，打印p的时候，是打印的返回结果，一个Promise实例。
+`new Promise(executor)` 时，传入的 executor 函数是同步执行的。当在 executor 中调用 resolve 或 reject 时，只是改变 Promise 的状态，then / catch 的回调不会立刻执行，而是被放入微任务队列，等主栈（同步代码）执行完后才执行。
+
+**Promise 的状态有三种：**
+
+- `pending`（进行中）
+- `fulfilled`（成功）
+- `rejected`（失败）
 
 ```javascript
 console.log('script start')
@@ -54,12 +196,12 @@ console.log('script end')
 // 输出顺序: script start->promise1->promise1 end->script end->promise2->settimeout
 ```
 
-当JS主线程执行到Promise对象时：
+当 JS 主线程执行到 Promise 对象时：
 
-* promise1.then() 的回调就是一个 task
-* promise1 是 resolved或rejected: 那这个 task 就会放入当前事件循环回合的 microtask queue
-* promise1 是 pending: 这个 task 就会放入 事件循环的未来的某个(可能下一个)回合的 microtask queue 中
-* setTimeout 的回调也是个 task ，它会被放入 macrotask queue 即使是 0ms 的情况
+- promise1.then() 的回调是一个微任务
+- promise1 是 fulfilled 或 rejected 时：这个微任务会放入当前事件循环回合的微任务队列
+- promise1 是 pending：这个微任务不会立刻入队。等将来某个时刻 Promise 状态改变了，才会入队。
+- setTimeout 的回调是一个宏任务，会被放入宏任务队列，即使是 0ms 的情况
 
 ### （3）async/await
 
@@ -72,76 +214,52 @@ async function async1(){
 async function async2(){
     console.log('async2')
 }
+
 console.log('script start');
 async1();
 console.log('script end')
 // 输出顺序：script start->async1 start->async2->script end->async1 end
 ```
 
-async 函数返回一个 Promise 对象，当函数执行的时候，一旦遇到 await 就会先返回，等到触发的异步操作完成，再执行函数体内后面的语句。可以理解为，是让出了线程，跳出了 async 函数体。
+async 函数返回一个 Promise 对象，当函数执行的时候，遇到 await 会暂停当前 async 函数的执行，把后面的代码放入微任务队列，等 await 的 Promise 完成后，再继续执行
 
-例如：
+## 4. 对Promise的理解 
 
-```javascript
-async function func1() {
-    return 1
-}
-console.log(func1())
-```
+Promise 对象是异步编程的一种解决方案。他的出现避免了回调地狱。Promise 是一个构造函数，接收一个函数作为参数，返回一个 Promise 实例。
 
-![1604021075237-8249a8df-3a28-4bca-9f22-02923aba8618.png](../public/images/js/1604021075237-8249a8df-3a28-4bca-9f22-02923aba8618-545227.png)
-
-func1的运行结果其实就是一个Promise对象。因此也可以使用then来处理后续逻辑。
-
-```javascript
-func1().then(res => {
-    console.log(res);  // 30
-})
-```
-
-await的含义为等待，也就是 async 函数需要等待await后的函数执行完成并且有了返回结果（Promise对象）之后，才能继续执行下面的代码。await通过返回一个Promise对象来实现同步的效果。
-
-## 3. 对Promise的理解
-
-Promise是异步编程的一种解决方案，它是一个对象，可以获取异步操作的消息，他的出现大大改善了异步编程的困境，避免了地狱回调，它比传统的解决方案回调函数和事件更合理和更强大。
-
-所谓Promise，简单说就是一个容器，里面保存着某个未来才会结束的事件（通常是一个异步操作）的结果。从语法上说，Promise 是一个对象，从它可以获取异步操作的消息。Promise 提供统一的 API，各种异步操作都可以用同样的方法进行处理。
-
-（1）Promise的实例有**三个状态**:
+一个 Promise 实例有三种状态
 
 * Pending（进行中）
-* Fulfilled（已完成）
-* Rejected（已拒绝）
+* Fulfilled（已成功）
+* Rejected（已失败）
 
-当把一件事情交给promise时，它的状态就是Pending，任务完成了状态就变成了Fulfilled、没有完成失败了就变成了Rejected。
-
-（2）Promise的实例有**两个过程**：
+Promise的实例有**两个过程**：
 
 * pending -> fulfilled : 已完成
 * pending -> rejected：已拒绝
 
 注意：一旦从进行状态变成为其他状态就永远不能更改状态了。
 
-**Promise的特点：**
 
-* 对象的状态不受外界影响。promise对象代表一个异步操作，有三种状态，`pending`（进行中）、`fulfilled`（已成功）、`rejected`（已失败）。只有异步操作的结果，可以决定当前是哪一种状态，任何其他操作都无法改变这个状态，这也是promise这个名字的由来——“**承诺**”；
-* 一旦状态改变就不会再变，任何时候都可以得到这个结果。promise对象的状态改变，只有两种可能：从`pending`变为`fulfilled`，从`pending`变为`rejected`。这时就称为`resolved`（已定型）。如果改变已经发生了，你再对promise对象添加回调函数，也会立即得到这个结果。这与事件（event）完全不同，事件的特点是：如果你错过了它，再去监听是得不到结果的。
 
-**Promise的缺点：**
-
-* 无法取消Promise，一旦新建它就会立即执行，无法中途取消。
-* 如果不设置回调函数，Promise内部抛出的错误，不会反应到外部。
-* 当处于pending状态时，无法得知目前进展到哪一个阶段（刚刚开始还是即将完成）。
-
-**总结：**
-
-Promise 对象是异步编程的一种解决方案，最早由社区提出。Promise 是一个构造函数，接收一个函数作为参数，返回一个 Promise 实例。一个 Promise 实例有三种状态，分别是pending、resolved 和 rejected，分别代表了进行中、已成功和已失败。实例的状态只能由 pending 转变 resolved 或者rejected 状态，并且状态一经改变，就凝固了，无法再被改变了。
-
-状态的改变是通过 resolve() 和 reject() 函数来实现的，可以在异步操作结束后调用这两个函数改变 Promise 实例的状态，它的原型上定义了一个 then 方法，使用这个 then 方法可以为两个状态的改变注册回调函数。这个回调函数属于微任务，会在本轮事件循环的末尾执行。
+**状态的改变是通过 resolve() 和 reject() 函数来实现的**，可以在异步操作结束后调用这两个函数改变 Promise 实例的状态，它的原型上定义了一个 then 方法，使用这个 **then 方法可以为两个状态的改变注册回调函数**。这个回调函数属于微任务，会在当前宏任务执行完、主栈空了之后，立刻清空微任务队列时执行。
 
 **注意：**在构造 `Promise` 的时候，构造函数内部的代码是立即执行的
 
-## 4. Promise的基本用法
+**Promise的特点：**
+
+* 对象的状态不受外界影响。只有异步操作的结果，可以决定当前是哪一种状态，任何其他操作都无法改变这个状态，这也是promise这个名字的由来——“**承诺**”；
+* 一旦状态改变就不会再变，**任何时候都可以得到这个结果**。Promise 会把结果存起来，状态改变后再 .then() 也能拿到；事件不保存，触发时没监听就错过了。 
+
+**Promise的缺点：**
+
+* 无法取消Promise，一旦新建Promise，传入的函数就会立即执行，无法中途取消。
+* 如果不设置回调函数，Promise内部抛出的错误，不会反应到外部。
+* 当处于pending状态时，无法得知目前进展到哪一个阶段（刚刚开始还是即将完成）。
+
+
+
+## 5. Promise的基本用法
 
 ### （1）创建Promise对象
 
@@ -160,7 +278,7 @@ const promise = new Promise(function(resolve, reject) {
 });
 ```
 
-**一般情况下都会使用**`new Promise()`**来创建promise对象，但是也可以使用**`promise.resolve`**和 **`promise.reject`**这两个方法：**
+**一般情况下都会使用**`new Promise()`**来创建promise对象，但是也可以使用**`Promise.resolve`**和 **`Promise.reject`**这两个方法：**
 
 * **Promise.resolve**
 
@@ -172,29 +290,30 @@ Promise.resolve(11).then(function(value){
 });
 ```
 
-`resolve(11)`代码中，会让promise对象进入确定(`resolve`状态)，并将参数`11`传递给后面的`then`所指定的`onFulfilled` 函数；
-
-创建promise对象可以使用`new Promise`的形式创建对象，也可以使用`Promise.resolve(value)`的形式创建promise对象；
+`resolve(11)`代码中，会让promise对象进入fulfilled状态，并将参数`11`传递给后面的`then`所指定的函数；
 
 * **Promise.reject**
 
 `Promise.reject` 也是`new Promise`的快捷形式，也创建一个promise对象。代码如下：
 
 ```javascript
-Promise.reject(new Error(“我错了，请原谅俺！！”));
+Promise.reject(new Error("出错"));
 ```
 
 就是下面的代码new Promise的简单形式：
 
 ```javascript
 new Promise(function(resolve,reject){
-   reject(new Error("我错了，请原谅俺！！"));
+   reject(new Error("出错"));
 });
 ```
+
+
 
 下面是使用resolve方法和reject方法：
 
 ```javascript
+// testPromise 本身不处理结果，只是“根据条件决定成功还是失败”，然后把决定权交给调用方。
 function testPromise(ready) {
   return new Promise(function(resolve,reject){
     if(ready) {
@@ -204,12 +323,11 @@ function testPromise(ready) {
     }
   });
 };
-// 方法调用
-testPromise(true).then(function(msg){
-  console.log(msg);
-},function(error){
-  console.log(error);
-});
+// 方法调用.then接受两个参数
+testPromise(true).then(
+  function onSuccess(msg) { console.log(msg) },
+  function onFail(error) { console.log(error) }
+)
 ```
 
 上面的代码的含义是给`testPromise`方法传递一个参数，返回一个promise对象，如果为`true`的话，那么调用promise对象中的`resolve()`方法，并且把其中的参数传递给后面的`then`第一个函数内，因此打印出 “`hello world`”, 如果为`false`的话，会调用promise对象中的`reject()`方法，则会进入`then`的第二个函数内，会打印`No thanks`；
@@ -220,9 +338,9 @@ Promise有五个常用的方法：then()、catch()、all()、race()、finally。
 
 1. **then()**
 
-当Promise执行的内容符合成功条件时，调用`resolve`函数，失败就调用`reject`函数。Promise创建完了，那该如何调用呢？
+当Promise执行的内容符合成功条件时，调用`resolve`函数，失败就调用`reject`函数。Promise创建完了，那该如何获得结果呢？
 
-```plain
+```js
 promise.then(function(value) {
   // success
 }, function(error) {
@@ -230,48 +348,49 @@ promise.then(function(value) {
 });
 ```
 
-`then`方法可以接受两个回调函数作为参数。第一个回调函数是Promise对象的状态变为`resolved`时调用，第二个回调函数是Promise对象的状态变为`rejected`时调用。其中第二个参数可以省略。
+**`then`方法可以接受两个回调函数作为参数**。
+第一个回调函数是Promise对象的状态变为`fulfilled`时调用，第二个回调函数是Promise对象的状态变为`rejected`时调用。其中第二个参数可以省略。
 
 `then`方法返回的是一个新的Promise实例（不是原来那个Promise实例）。因此可以采用链式写法，即`then`方法后面再调用另一个then方法。
 
 当要写有顺序的异步事件时，需要串行时，可以这样写：
 
 ```javascript
-let promise = new Promise((resolve,reject)=>{
-    ajax('first').success(function(res){
-        resolve(res);
-    })
-})
-promise.then(res=>{
-    return new Promise((resovle,reject)=>{
-        ajax('second').success(function(res){
-            resolve(res)
-        })
-    })
-}).then(res=>{
-    return new Promise((resovle,reject)=>{
-        ajax('second').success(function(res){
-            resolve(res)
-        })
-    })
-}).then(res=>{
-    
-})
+//用 Promise 链式调用串行发多个请求。
+let promise = fetch('/api/first')
+  .then(res => res.json())
+
+promise
+  .then(res => {
+    console.log('第一个请求完成：', res)
+    return fetch('/api/second').then(res => res.json())
+  })
+  .then(res => {
+    console.log('第二个请求完成：', res)
+    return fetch('/api/third').then(res => res.json())
+  })
+  .then(res => { 
+    console.log('第三个请求完成：', res)
+  })
 ```
 
 那当要写的事件没有顺序或者关系时，还如何写呢？可以使用`all` 方法来解决。
 
 **2. catch()**
 
-Promise对象除了有then方法，还有一个catch方法，该方法相当于`then`方法的第二个参数，指向`reject`的回调函数。不过`catch`方法还有一个作用，就是在执行`resolve`回调函数时，如果出现错误，抛出异常，不会停止运行，而是进入`catch`方法中。
+Promise对象有一个catch方法，该方法相当于`then`方法的第二个参数，指向`reject`的回调函数。不过`catch`方法还有一个作用，就是在执行`resolve`回调函数时，如果出现错误，抛出异常，不会停止运行，而是进入`catch`方法中。
 
 ```javascript
-p.then((data) => {
-     console.log('resolved',data);
-},(err) => {
-     console.log('rejected',err);
-     }
-); 
+//.then 的第二个参数只能捕获 p 本身的错误
+p.then(
+  (data) => {
+    console.log('resolved', data)   // 成功回调
+  },
+  (err) => {
+    console.log('rejected', err)    // 失败回调
+  }
+) 
+//.catch 能捕获整条链上的错误。
 p.then((data) => {
     console.log('resolved',data);
 }).catch((err) => {
@@ -281,10 +400,11 @@ p.then((data) => {
 
 **3. all()**
 
-`all`方法可以完成并行任务， 它接收一个数组，数组的每一项都是一个`promise`对象。当数组中所有的`promise`的状态都达到`resolved`的时候，`all`方法的状态就会变成`resolved`，如果有一个状态变成了`rejected`，那么`all`方法的状态就会变成`rejected`。
+`all`方法可以完成并行任务， 它接收一个数组，数组的每一项都是一个`promise`对象。
+当数组中所有的`promise`的状态都达到`fulfilled`的时候，`all`方法的状态就会变成`fulfilled`；
+如果有一个状态变成了`rejected`，那么`all`方法的状态就会变成`rejected`。
 
 ```javascript
-javascript
 let promise1 = new Promise((resolve,reject)=>{
 	setTimeout(()=>{
        resolve(1);
@@ -306,11 +426,11 @@ Promise.all([promise1,promise2,promise3]).then(res=>{
 })
 ```
 
-调用`all`方法时的结果成功的时候是回调函数的参数也是一个数组，这个数组按顺序保存着每一个promise对象`resolve`执行时的值。
+调用`all`方法时的结果 成功的时候回调函数的参数也是一个数组，这个数组按顺序保存着每一个promise对象`resolve`执行时的值。
 
-**（4）race()**
+**4. race()**
 
-`race`方法和`all`一样，接受的参数是一个每项都是`promise`的数组，但是与`all`不同的是，当最先执行完的事件执行完之后，就直接返回该`promise`对象的值。如果第一个`promise`对象状态变成`resolved`，那自身的状态变成了`resolved`；反之第一个`promise`变成`rejected`，那自身状态就会变成`rejected`。
+`race`方法和`all`一样，接受的参数是一个每项都是`promise`的数组，但是与`all`不同的是，**当最先执行完的事件执行完之后，就直接返回该`promise`对象的值。**如果第一个`promise`对象状态变成`fulfilled`，那自身的状态变成了`fulfilled`；反之第一个`promise`变成`rejected`，那自身状态就会变成`rejected`。
 
 ```javascript
 let promise1 = new Promise((resolve,reject)=>{
@@ -330,13 +450,13 @@ let promise3 = new Promise((resolve,reject)=>{
 });
 Promise.race([promise1,promise2,promise3]).then(res=>{
 	console.log(res);
-	//结果：2
+	//结果：2（promise2的回调先执行完
 },rej=>{
     console.log(rej)};
 )
 ```
 
-那么`race`方法有什么实际作用呢？当要做一件事，超过多长时间就不做了，可以用这个方法来解决：
+那么**`race`方法**有什么实际作用呢？**当要做一件事，超过多长时间就不做了**，可以用这个方法来解决：
 
 ```javascript
 Promise.race([promise1,timeOutPromise(5000)]).then(res=>{})
@@ -344,7 +464,7 @@ Promise.race([promise1,timeOutPromise(5000)]).then(res=>{})
 
 **5. finally()**
 
-`finally`方法用于指定不管 Promise 对象最后状态如何，都会执行的操作。该方法是 ES2018 引入标准的。
+`finally`方法用于指定不管 Promise 对象最后状态如何，都会执行的操作。
 
 ```javascript
 promise
@@ -355,7 +475,7 @@ promise
 
 上面代码中，不管`promise`最后的状态，在执行完`then`或`catch`指定的回调函数以后，都会执行`finally`方法指定的回调函数。
 
-下面是一个例子，服务器使用 Promise 处理请求，然后使用`finally`方法关掉服务器。
+下面是一个例子，**服务器使用 Promise 处理请求，然后使用`finally`方法关掉服务器。**
 
 ```javascript
 server.listen(port)
@@ -388,7 +508,11 @@ promise
 
 上面代码中，如果不使用`finally`方法，同样的语句需要为成功和失败两种情况各写一次。有了`finally`方法，则只需要写一次。
 
-## 5. Promise解决了什么问题
+---
+
+
+
+## 6. Promise解决了什么问题
 
 在工作中经常会碰到这样一个需求，比如我使用ajax发一个A请求后，成功后拿到数据，需要把数据传给B请求；那么需要如下编写代码：
 

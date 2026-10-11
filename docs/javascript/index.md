@@ -17,3 +17,5 @@ comments: false
 - [JavaScript闭包](/javascript/js-closure)
 - [JavaScript: 关于this](/javascript/js-this)
 - [JavaScript异步编程](/javascript/js-asynchronous-programming)
+- [JavaScript防抖节流](/javascript/js-debounce-throttle)
+

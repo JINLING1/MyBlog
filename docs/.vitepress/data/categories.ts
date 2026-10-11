@@ -83,6 +83,15 @@ export const categories: BlogCategory[] = [
     ]
   },
   {
+    slug: 'backend',
+    label: 'Backend',
+    shortLabel: 'Backend',
+    description: '整理 Node.js、MySQL 与后端开发中的基础知识。',
+    icon: 'BE',
+    accent: '#fb7185',
+    articles: []
+  },
+  {
     slug: 'it-basics',
     label: 'IT 基础',
     shortLabel: 'IT 基础',

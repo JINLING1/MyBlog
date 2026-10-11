@@ -12,6 +12,7 @@ comments: false
 
 - [可复用的 AI 协作工作流](/ai-productivity/workflow)
 - [Skills的最佳实践](/ai-productivity/skills)
+- [AI Coding 的一些技巧](/ai-productivity/ai-coding)
 
 ## 计划整理
 

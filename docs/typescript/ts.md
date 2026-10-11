@@ -1,7 +1,7 @@
 ---
 title: TypeScript
 description: 待补充
-date: 2026-10-01
+date: 2026-10-11
 tags:
   - TypeScript
 comments: true

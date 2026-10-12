@@ -22,7 +22,9 @@ export const categories: BlogCategory[] = [
     icon: '</>',
     accent: '#38bdf8',
     articles: [
-      { text: 'CSS', link: '/html-css/css' },
+      { text: 'CSS 基础', link: '/html-css/css-basics' },
+      { text: 'CSS 布局', link: '/html-css/css-layout' },
+      { text: 'CSS 定位与浮动', link: '/html-css/css-position' },
       { text: 'HTML', link: '/html-css/html' }
     ]
   },

@@ -10,4 +10,4 @@ comments: false
 
 ## 从这里开始
 
-- [Vue](/vue/vue)
+- [Vue 基础](/vue/vue-basic)

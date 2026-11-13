@@ -1,11 +1,7 @@
 import { defineConfig, type HeadConfig } from 'vitepress'
 import { withPwa } from '@vite-pwa/vitepress'
-import {
-  categories,
-  categorySidebar,
-  directNavCategories,
-  moreNavCategories
-} from './data/categories'
+import { directNavCategories, moreNavCategories } from './data/categories'
+import { buildSidebar, reloadSidebarOnArticleChange } from './data/articles'
 
 const canonicalOrigin = (
   process.env.SITE_URL ||
@@ -30,6 +26,9 @@ export default withPwa(
     lastUpdated: true,
     sitemap: {
       hostname: canonicalOrigin
+    },
+    vite: {
+      plugins: [reloadSidebarOnArticleChange()]
     },
     head: [
       ['link', { rel: 'icon', href: '/favicon-32x32.png', type: 'image/png' }],
@@ -82,7 +81,7 @@ export default withPwa(
           ]
         }
       ],
-      sidebar: categorySidebar,
+      sidebar: buildSidebar(),
       outline: {
         level: [2, 4],
         label: '本页目录'

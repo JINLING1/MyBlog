@@ -39,7 +39,13 @@ comments: true
 ---
 ```
 
-栏目、首页卡片、导航与侧边栏统一维护在 `docs/.vitepress/data/categories.ts`。
+侧边栏和首页目录里的文章列表根据 `docs/<栏目>/` 下的文件自动生成：把 `.md` 文件放进栏目文件夹即可，显示的文字取自 frontmatter 的 `title`。
+
+- 默认按文件名排序；在 frontmatter 里加 `order: 1` 可以手动排在前面（数字小的在前）。
+- 加 `hidden: true` 的文章不出现在列表里，但仍可通过链接访问。
+- 每个栏目的 `index.md` 是栏目概览，不计入文章。
+
+栏目本身（名称、描述、顺序、导航）仍维护在 `docs/.vitepress/data/categories.ts`。
 
 ## 配置 Giscus
 

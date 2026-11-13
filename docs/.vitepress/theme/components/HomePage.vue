@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { categories } from '../../data/categories'
+import { data as categories } from '../../data/home.data'
 
 const noteCount = categories.reduce((total, category) => total + category.articles.length, 0)
 </script>

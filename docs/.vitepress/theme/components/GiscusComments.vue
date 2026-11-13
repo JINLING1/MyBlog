@@ -20,7 +20,6 @@ const showComments = computed(() => hasConfig && frontmatter.value.comments !== 
 <template>
   <section v-if="showComments" class="giscus-section" aria-labelledby="comments-heading">
     <div class="comments-heading">
-      <span aria-hidden="true">&lt;/&gt;</span>
       <h2 id="comments-heading">讨论与补充</h2>
     </div>
     <p>发现问题或有新的思路？欢迎留下你的观点。</p>

@@ -12,7 +12,7 @@ comments: false
 
 当前栏目正在整理中，后续会持续加入可独立阅读的基础文章。
 
-[Node.js基础知识](/backend-nodejs)
+[Node.js基础知识](/backend/nodejs)
 
 ## 计划整理
 

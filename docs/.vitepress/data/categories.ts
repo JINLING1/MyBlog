@@ -91,16 +91,20 @@ export const categories: BlogCategory[] = [
     description: '整理 Node.js、MySQL 与后端开发中的基础知识。',
     icon: 'BE',
     accent: '#fb7185',
-    articles: []
+    articles: [{ text: 'Node.js 基础知识', link: '/backend/nodejs' }]
   },
   {
     slug: 'it-basics',
     label: 'IT 基础',
     shortLabel: 'IT 基础',
-    description: '补齐网络、系统、Git 与计算机基础知识。',
+    description: '补齐计算机网络、操作系统与 SQL 基础知识。',
     icon: '01',
     accent: '#fb7185',
-    articles: [{ text: '基础知识', link: '/it-basics/web-request' }]
+    articles: [
+      { text: '计算机网络', link: '/it-basics/network' },
+      { text: '操作系统', link: '/it-basics/os' },
+      { text: 'SQL', link: '/it-basics/sql' }
+    ]
   },
   {
     slug: 'essays',

@@ -58,6 +58,14 @@ export const categories: BlogCategory[] = [
     accent: '#22d3ee'
   },
   {
+    slug: 'ai-engineering',
+    label: 'AI 应用开发',
+    shortLabel: 'AI 应用开发',
+    description: '大模型基础、RAG、Agent 与模型服务的工程化落地。',
+    icon: 'LLM',
+    accent: '#818cf8'
+  },
+  {
     slug: 'ai-productivity',
     label: 'AI 提效',
     shortLabel: 'AI 提效',
@@ -69,7 +77,7 @@ export const categories: BlogCategory[] = [
     slug: 'backend',
     label: 'Backend',
     shortLabel: 'Backend',
-    description: '整理 Node.js、MySQL 与后端开发中的基础知识。',
+    description: '整理 Node.js、Java、Redis 与高并发后端开发中的基础知识。',
     icon: 'BE',
     accent: '#fb7185'
   },
@@ -77,7 +85,7 @@ export const categories: BlogCategory[] = [
     slug: 'it-basics',
     label: 'IT 基础',
     shortLabel: 'IT 基础',
-    description: '补齐计算机网络、操作系统与 SQL 基础知识。',
+    description: '补齐计算机网络、操作系统、SQL、数据结构与设计模式基础知识。',
     icon: '01',
     accent: '#fb7185'
   },

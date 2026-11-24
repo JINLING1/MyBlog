@@ -1,6 +1,6 @@
 ---
 title: JavaScript数据类型
-description: 介绍js的数据类型，以及如何判断数据类型，隐式类型转换等知识
+description: JavaScript 数据类型知识点：基本类型与引用类型、类型检测方式、null 与 undefined、instanceof 原理、0.1+0.2 精度问题、== 与 === 和 Object.is、隐式类型转换、深浅拷贝。
 date: 2026-10-01
 tags:
   - JavaScript

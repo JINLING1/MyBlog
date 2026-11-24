@@ -1,6 +1,6 @@
 ---
 title: JavaScript异步编程
-description: 待补充
+description: JavaScript 异步编程知识点：事件循环、宏任务与微任务，setTimeout、Promise、async/await 的区别与用法，Promise.all 与 Promise.race，以及 async/await 的异常捕获。
 date: 2026-10-11
 tags:
   - JavaScript

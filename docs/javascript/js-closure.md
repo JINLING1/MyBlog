@@ -1,6 +1,6 @@
 ---
 title: JavaScript闭包
-description: 待补充
+description: 深入理解 JavaScript 闭包：闭包的概念与用途、作用域与作用域链、块级作用域，以及执行上下文的类型、执行上下文栈和创建过程。
 date: 2026-10-09
 tags:
   - JavaScript

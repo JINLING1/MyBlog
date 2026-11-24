@@ -1,6 +1,6 @@
 ---
-title: JavaScript-ES6
-description: 待补充
+title: JavaScript ES6 新特性
+description: ES6 常考知识点：let、const、var 的区别，const 变量能否修改，箭头函数与普通函数的区别，对象和数组解构，模板字符串与字符串处理。
 date: 2026-10-01
 tags:
   - JavaScript

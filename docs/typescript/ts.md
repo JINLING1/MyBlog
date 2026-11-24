@@ -1,6 +1,6 @@
 ---
-title: TypeScript
-description: 待补充
+title: TypeScript 核心知识点
+description: TypeScript 核心知识点：interface 与 type 的区别，any、unknown、never 的用法，泛型的作用与常见写法，以及 extends 在继承、泛型约束和条件类型中的用法。
 date: 2026-10-11
 tags:
   - TypeScript

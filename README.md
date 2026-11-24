@@ -72,11 +72,30 @@ comments: true
 
 ```text
 NODE_VERSION=20
-SITE_URL=https://<project-name>.pages.dev
+SITE_URL=https://jinling-blog.pages.dev
 GITHUB_REPOSITORY=<owner>/JinLingBlog
 ```
 
-`SITE_URL` 用于 canonical 和 sitemap，`GITHUB_REPOSITORY` 用于 GitHub 社交链接与“编辑此页”。如果最终域名不是 `https://jinlingblog.pages.dev`，还需要同步更新 `docs/public/robots.txt` 中的 Sitemap 地址。
+`SITE_URL` 是站点的正式地址，canonical、sitemap 和 robots.txt 都由它生成，不填时默认为 `https://jinling-blog.pages.dev`。换自定义域名时只需改这一个值。`GITHUB_REPOSITORY` 用于 GitHub 社交链接与“编辑此页”。
+
+构建前会自动补全 git 历史（Cloudflare 是浅克隆），保证每篇文章的“最后更新于”和 sitemap 的更新时间准确。
+
+## 搜索引擎收录
+
+- 不想被收录的页面（占位页、404 等），在 frontmatter 加 `noindex: true`：页面会带上 noindex 标记，并从 sitemap 中排除
+- 每篇文章的 `description` 就是搜索结果里显示的摘要，请写清楚这篇覆盖的知识点
+- 文章页自动输出发布时间、修改时间、标签和结构化数据（JSON-LD）
+
+验证站点所有权：在 Google Search Console、Bing Webmaster Tools、百度搜索资源平台选择“HTML 标签”验证，把 `content` 的值填到 Cloudflare Pages 的环境变量 `GOOGLE_SITE_VERIFICATION`、`BING_SITE_VERIFICATION`、`BAIDU_SITE_VERIFICATION`，重新部署后再点验证，然后提交 `https://jinling-blog.pages.dev/sitemap.xml`。
+
+部署后主动提交新地址：
+
+```bash
+pnpm submit:urls --dry-run   # 先查看将提交的地址
+pnpm submit:urls             # 提交到百度和 IndexNow（Bing 等）
+```
+
+需要在 `.env.local` 中设置 `BAIDU_PUSH_TOKEN`（百度普通收录 API 的 token）和/或 `INDEXNOW_KEY`；`INDEXNOW_KEY` 还要在 Cloudflare Pages 设置相同的值，构建时会生成对应的密钥文件。
 
 ## 品牌资源
 

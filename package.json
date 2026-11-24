@@ -10,10 +10,11 @@
   "scripts": {
     "dev": "vitepress dev docs",
     "generate:icons": "node scripts/generate-icons.mjs",
-    "prebuild": "pnpm generate:icons",
+    "prebuild": "node scripts/ensure-git-history.mjs && pnpm generate:icons",
     "build": "vitepress build docs",
     "preview": "vitepress preview docs",
-    "check": "pnpm build"
+    "check": "pnpm build",
+    "submit:urls": "node scripts/submit-urls.mjs"
   },
   "dependencies": {
     "@giscus/vue": "^3.1.1",

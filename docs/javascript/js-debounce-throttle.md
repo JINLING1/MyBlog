@@ -1,6 +1,6 @@
 ---
 title: JavaScript防抖与节流
-description: 待补充
+description: JavaScript 防抖与节流的原理、手写实现与适用场景，以及两者的区别。
 date: 2026-10-11
 tags:
   - JavaScript

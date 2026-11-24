@@ -1,6 +1,6 @@
 ---
 title: AI Coding 的一些技巧
-description: 待补充
+description: AI 辅助编码的实践技巧：怎么写 prompt、控制输出质量，AI 生成代码的 Bug 定位与正确性验证，以及让 AI 参与 CI/CD 和自动代码审查。
 date: 2026-10-11
 tags:
   - AI

@@ -1,6 +1,6 @@
 ---
 title: JavaScript的this
-description: 待补充
+description: JavaScript 中 this 的指向规则，call、apply、bind 的区别与手写实现，以及它们的常见用途。
 date: 2026-10-11
 tags:
   - JavaScript

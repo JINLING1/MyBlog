@@ -8,7 +8,7 @@ comments: true
 
 ---
 
-# Vue 基础
+# Vue  基础
 
 ## 1. Vue的基本原理
 
@@ -121,8 +121,6 @@ slot 分三类：
 
 在组件卸载前的钩子里（Vue 2 `beforeDestroy` / Vue 3 `beforeUnmount` / React `componentWillUnmount`），把组件状态通过 `JSON.stringify()` 存进 Storage。
 
-比如从 B 组件跳转到 A 组件时，我们希望 A 组件恢复之前的状态；但如果从其他组件跳转到 A 组件，我们希望 A 组件重新渲染，不读 Storage。所以需要加一个 flag 判断这次进入 A 是不是来自 B。
-
 **优点**
 
 * 兼容性好，不需要额外库。简单快捷，基本可以满足大部分需求。
@@ -131,47 +129,32 @@ slot 分三类：
 
 - JSON 方法序列化后，`Date`、`RegExp` 等会丢失类型，`undefined`、函数、`Symbol` 会丢失，循环引用会报错。
 
-* 如果 B 组件后退或者下一页跳转并不是前组件，那么 flag 判断会失效，导致从其他页面进入 A 组件页面时 A 组件会重新读取 Storage，会造成很奇怪的现象
-
 #### **（2）路由传值**
 
-通过 react-router 的 Link 组件的 prop —— to 可以实现路由间传递参数的效果。
+通过路由跳转时携带参数来实现状态传递。常用方式有两种：
 
-在这里需要用到 state 参数，在 B 组件中通过 history.location.state 就可以拿到 state 值，保存它。返回 A 组件时再次携带 state 达到路由状态保持的效果。
+- **通过 `query` 传参**：如 `this.$router.push({ query: { page: 2 } })`。状态会暴露在 URL 中，刷新不丢失。目标组件通过 `$route.query` 读取。
+- **通过 `state` 隐式传参**：如 `this.$router.push({ state: { scrollTop: 500 } })`。参数通过浏览器原生的 `history.state` 保存，不会出现在 URL 中，而且刷新不丢失，适合传递复杂对象（如 `Date` 对象，不受 JSON 序列化影响）。目标组件通过 `history.state` 读取。
 
 **优点**
 
 * 简单快捷，不会污染 LocalStorage / SessionStorage。
-* 可以传递 Date、RegExp 等特殊对象（不用担心 JSON.stringify / parse 的不足）
+* 可以传递 Date、RegExp 等特殊对象
 
 **缺点**
 
-* 如果 A 组件可以跳转至多个组件，那么在每一个跳转组件内都要写相同的逻辑。
+* 如果 A 组件可以跳转至多个组件，需要在每个跳转的地方都写相应的传参逻辑，维护成本较高。
 
 ### **组件不会被卸载：**
 
-#### **（1）单页面渲染**
+#### （1）keep-alive
 
-要切换的组件作为子组件全屏渲染，父组件中正常储存页面状态。
+在Vue中，可以用**keep-alive**来缓存页面，当组件在keep-alive内被切换时组件的**activated、deactivated**这两个生命周期钩子函数会被执行，被包裹在keep-alive中的组件的状态将会被保留：
 
-#### 优点
-
-* 代码量少
-* 不需要考虑状态传递过程中的错误
-
-#### 缺点
-
-* 增加 A 组件维护成本
-* 需要传入额外的 prop 到 B 组件
-* 无法利用路由定位页面
-
-除此之外，在Vue中，还可以是用keep-alive来缓存页面，当组件在keep-alive内被切换时组件的**activated、deactivated**这两个生命周期钩子函数会被执行
-
-被包裹在keep-alive中的组件的状态将会被保留：
-
-```javascript
-<keep-alive>
-	<router-view v-if="$route.meta.keepAlive"></router-view>
+```vue
+ <!--cachedViews为存储需要缓存的组件名的数组-->
+<keep-alive :include="cachedViews">   
+  <router-view></router-view>
 </keep-alive>
 ```
 
@@ -1137,7 +1120,7 @@ const updateMessage = async () => {
 
   示例：
 
-  ```html
+  ``` html
   <input v-model="text"></input>
   // 等价于：
   <input :value="text" @input="text = $event.target.value"></input>

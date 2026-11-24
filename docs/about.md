@@ -25,3 +25,8 @@ comments: false
 ## 技术架构
 
 本站使用 VitePress 和 Markdown 构建，通过 Cloudflare Pages 发布，并使用浏览器本地索引完成全文搜索。
+
+## 引用
+部分内容参考了以下博客和文档：
+- [前端充电宝](https://www.yuque.com/cuggz/interview)
+- [MDN](https://developer.mozilla.org/zh-CN/)

@@ -1,6 +1,6 @@
 ---
 title: JavaScript基础
-description: 待补充
+description: JavaScript 基础知识点：new 操作符原理、Map 与 Object 的区别、正则表达式、变量提升、常见 DOM 操作、AJAX/axios/fetch 的区别，以及数组遍历方法。
 date: 2026-10-01
 tags:
   - JavaScript

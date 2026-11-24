@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://jinlingblog.pages.dev/sitemap.xml

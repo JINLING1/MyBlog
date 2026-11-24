@@ -1,6 +1,6 @@
 ---
 title: Vue 基础
-description: 待补充 
+description: Vue 基础知识点：Vue2 与 Vue3 的响应式原理、从 defineProperty 换成 Proxy 的原因、computed 与 watch、slot、v-if 与 v-show、keep-alive 和 $nextTick 原理。
 date: 2026-10-13
 tags:
   - Vue

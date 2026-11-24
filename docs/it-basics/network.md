@@ -6,6 +6,7 @@ order: 1
 tags:
   - Network
 comments: true
+noindex: true
 ---
 
 # 计算机网络

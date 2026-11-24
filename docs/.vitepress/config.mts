@@ -1,32 +1,32 @@
-import { defineConfig, type HeadConfig } from 'vitepress'
+import { defineConfig } from 'vitepress'
 import { withPwa } from '@vite-pwa/vitepress'
 import { directNavCategories, moreNavCategories } from './data/categories'
 import { buildSidebar, reloadSidebarOnArticleChange } from './data/articles'
-
-const canonicalOrigin = (
-  process.env.SITE_URL ||
-  process.env.CF_PAGES_URL ||
-  'https://jinlingblog.pages.dev'
-).replace(/\/$/, '')
+import {
+  canonicalOrigin,
+  filterSitemap,
+  seoHead,
+  siteDescription,
+  siteName,
+  verificationHead,
+  writeCrawlerFiles
+} from './seo'
 
 const githubRepository = process.env.GITHUB_REPOSITORY
-
-function pagePath(relativePath: string) {
-  const normalized = relativePath.replace(/(^|\/)index\.md$/, '$1').replace(/\.md$/, '')
-  return normalized ? `/${normalized}` : '/'
-}
 
 export default withPwa(
   defineConfig({
     lang: 'zh-CN',
-    title: 'JinLingBlog',
-    titleTemplate: ':title · JinLingBlog',
-    description: 'Code. Log. Share. 记录、整理与分享技术知识。',
+    title: siteName,
+    titleTemplate: `:title · ${siteName}`,
+    description: siteDescription,
     cleanUrls: true,
     lastUpdated: true,
     sitemap: {
-      hostname: canonicalOrigin
+      hostname: canonicalOrigin,
+      transformItems: filterSitemap
     },
+    buildEnd: writeCrawlerFiles,
     vite: {
       plugins: [reloadSidebarOnArticleChange()]
     },
@@ -36,27 +36,14 @@ export default withPwa(
       ['meta', { name: 'theme-color', content: '#F7F8FC', media: '(prefers-color-scheme: light)' }],
       ['meta', { name: 'theme-color', content: '#101218', media: '(prefers-color-scheme: dark)' }],
       ['meta', { name: 'author', content: 'JinLing' }],
-      ['meta', { name: 'robots', content: 'index, follow' }],
-      ['meta', { property: 'og:type', content: 'website' }],
-      ['meta', { property: 'og:site_name', content: 'JinLingBlog' }],
+      ['meta', { property: 'og:site_name', content: siteName }],
+      ['meta', { property: 'og:locale', content: 'zh_CN' }],
       ['meta', { property: 'og:image', content: `${canonicalOrigin}/og.png` }],
       ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
-      ['meta', { name: 'twitter:image', content: `${canonicalOrigin}/og.png` }]
+      ['meta', { name: 'twitter:image', content: `${canonicalOrigin}/og.png` }],
+      ...verificationHead()
     ],
-    transformHead({ pageData }) {
-      const title = pageData.title ? `${pageData.title} · JinLingBlog` : 'JinLingBlog'
-      const description = pageData.description || 'Code. Log. Share. 记录、整理与分享技术知识。'
-      const canonical = `${canonicalOrigin}${pagePath(pageData.relativePath)}`
-
-      return [
-        ['link', { rel: 'canonical', href: canonical }],
-        ['meta', { property: 'og:title', content: title }],
-        ['meta', { property: 'og:description', content: description }],
-        ['meta', { property: 'og:url', content: canonical }],
-        ['meta', { name: 'twitter:title', content: title }],
-        ['meta', { name: 'twitter:description', content: description }]
-      ] as HeadConfig[]
-    },
+    transformHead: seoHead,
     themeConfig: {
       logo: {
         light: '/logo-mark-light.png',

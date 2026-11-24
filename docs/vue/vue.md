@@ -1,6 +1,6 @@
 ---
-title: Vue
-description: 待补充 
+title: Vue 进阶知识点
+description: Vue 进阶知识点：生命周期与父子组件执行顺序、组件通信方式、Vue Router 的模式与导航守卫、Vuex、Vue 3 的更新与 Composition API，以及虚拟 DOM 和 diff 算法。
 date: 2026-10-07
 tags:
   - Vue

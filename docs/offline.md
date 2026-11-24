@@ -2,6 +2,7 @@
 title: 当前处于离线状态
 description: JinLingBlog 离线访问提示。
 comments: false
+noindex: true
 sidebar: false
 aside: false
 search: false

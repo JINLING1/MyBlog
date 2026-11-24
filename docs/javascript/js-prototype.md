@@ -1,6 +1,6 @@
 ---
 title: JavaScript原型
-description: js的原型，原型链的理解，如何获取原型，prototype和__proto__区别
+description: JavaScript 原型与原型链：prototype 与 __proto__ 的关系、原型的修改与重写、原型链的指向与终点，以及如何获取对象自身（非原型链上）的属性。
 date: 2026-10-08
 tags:
   - JavaScript

@@ -1,6 +1,6 @@
 ---
-title: React
-description: 待补充
+title: React 核心知识点
+description: React 知识点汇总：组件与事件机制、Fiber、setState 与数据管理、生命周期、组件通信、React Router、Redux、Hooks 和虚拟 DOM。
 date: 2026-10-07
 tags:
   - React

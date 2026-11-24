@@ -181,7 +181,7 @@ ECDHE 不直接传输共享秘密。客户端和服务端各自生成临时密�
 
 所以一句话总结：**RSA 是客户端把秘密加密送过去；ECDHE 是双方用临时密钥协商出秘密。ECDHE 支持前向安全，也因此成为现代 HTTPS 的主流方向。**
 
-详细介绍：[HTTPS 握手里的 RSA 和 ECDHE，到底差在哪？（应用层）](/cs-basics/network/https-rsa-vs-ecdhe.html)
+详细介绍：[HTTPS 握手里的 RSA 和 ECDHE，到底差在哪？（应用层）](https://javaguide.cn/cs-basics/network/https-rsa-vs-ecdhe.html)
 
 ### [⭐️ 有了 HTTP，为什么还要 RPC？](#⭐️-有了-http-为什么还要-rpc)
 
@@ -202,7 +202,7 @@ HTTP 能调服务，RPC 也能调服务。真正的区别在于，你是想把�
 
 一句话：**HTTP 没那么弱，RPC 也没那么神。选哪个，主要看它能不能用更低成本解决你现在的问题。**
 
-详细介绍：[⭐️有了HTTP，为什么还要RPC？](/cs-basics/network/http-vs-rpc.html)
+详细介绍：[⭐️有了HTTP，为什么还要RPC？](https://javaguide.cn/cs-basics/network/http-vs-rpc.html)
 
 ### [HTTP/1.0 和 HTTP/1.1 有什么区别？](#http-1-0-和-http-1-1-有什么区别)
 
@@ -543,7 +543,7 @@ Ping 使用 ICMP（网络层），TCP 连接使用 TCP（传输层），两者�
 
 
 
-详细介绍：[能 Ping 通，TCP 就一定能连通吗？](/cs-basics/network/can-ping-but-tcp-may-not-connect.html)
+详细介绍：[能 Ping 通，TCP 就一定能连通吗？](https://javaguide.cn/cs-basics/network/can-ping-but-tcp-may-not-connect.html)
 
 ## [DNS](#dns)
 

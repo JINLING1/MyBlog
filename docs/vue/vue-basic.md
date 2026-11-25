@@ -8,239 +8,211 @@ comments: true
 
 ---
 
-# Vue  基础
+# Vue 基础
 
-## 1. Vue的基本原理
+## 1. 响应式原理：数据变化如何驱动视图更新
 
-### Vue2
+Vue 的响应式分三步：**拦截数据 → 收集依赖 → 派发更新**。Vue 2 和 Vue 3 的区别在于“怎么拦截”和“依赖存在哪里”。
 
-**数据劫持**： 组件实例创建时，Vue 会**递归遍历 `data` 及其嵌套对象**，用 **`Object.defineProperty`** 为每个属性添加 getter/setter。(如果是数组，会重写它的七个原型方法)
+### Vue 2：Object.defineProperty + Watcher
 
-**依赖收集**：渲染 watcher 执行渲染函数时**访问数据会触发 getter**，getter 把当前 watcher 加入该属性的 Dep 中。
+1. **数据劫持**：组件实例创建时，Vue 会**递归遍历 `data` 及其嵌套对象**，用 **`Object.defineProperty`** 为每个属性添加 getter / setter。数组则通过重写 7 个原型方法来拦截（见第 10 节）。
+2. **依赖收集**：渲染 watcher 执行渲染函数时，**读取数据会触发 getter**，getter 把当前 watcher 加入该属性的 Dep 中。
+3. **派发更新**：修改数据时触发 **setter**，setter 调用 `dep.notify()`，通知 Dep 里的所有 watcher 执行 `update()`。`update()` 把更新任务推入异步队列，在 `nextTick` 中批量执行，最终重新渲染组件。
 
-> 每个组件实例对应一个**渲染 watcher**，它负责组件的渲染。 每个属性内部有一个 **Dep（依赖收集器）**，用来存 watcher。 
+> - **渲染 watcher**：每个组件实例对应一个，负责该组件的渲染。
+> - **Dep（依赖收集器）**：每个属性内部都有一个，用来存放依赖它的 watcher。
 
-**派发更新**:  当数据被修改时，触发 **setter**，setter 调用 `dep.notify()`，通知 Dep 里所有 watcher 执行 `update()`，`update()` 会把更新推入异步队列，在 `nextTick` 里批量执行，最终重新渲染组件。
+### Vue 3：Proxy + Effect
 
+1. **数据代理**：组件实例创建时，Vue 3 用 **`Proxy`** 代理整个对象，配合 **`Reflect`** 操作属性，拦截 `get`、`set`、`deleteProperty` 等操作。代理是**惰性的**：访问到嵌套对象时才为它创建代理，不像 Vue 2 那样在初始化时递归遍历。数组也不需要重写方法，`Proxy` 能直接拦截下标和 `length` 的修改。
+2. **依赖收集**：渲染 effect 执行渲染函数时，**读取数据会触发 `get` 拦截器**，`get` 调用 **`track`** 把当前 effect 加入该属性的 Dep 中。
+3. **派发更新**：修改数据时触发 **`set` 拦截器**，`set` 调用 **`trigger`**，通知 Dep 里的所有 effect 重新执行。渲染更新同样会被推入异步队列，在 `nextTick` 中批量执行。
 
+> - **effect** 相当于 Vue 2 的 watcher，负责依赖收集和更新。
+> - 依赖关系存放在全局的 **`targetMap`** 中，结构为 `WeakMap<对象, Map<属性, Dep>>`。
 
-### Vue3
+effect 按用途分为三类：
 
-**数据代理**：组件实例创建时，Vue 3 用 **`Proxy`** 代理整个对象，配合 **`Reflect`** 操作属性。`Proxy` 会拦截对象的 `get` / `set` 等操作。**它是惰性的**：访问到嵌套对象时，才为它创建代理，不像 Vue 2 那样初始化时递归遍历。
+| 类型 | 用途 |
+| --- | --- |
+| 渲染 effect | 每个组件一个，负责渲染 |
+| 计算 effect | `computed` 使用 |
+| 用户 effect | `watch` 使用 |
 
-> Vue 3 内部通过 **`track`** 收集依赖，依赖关系存在全局的 **`targetMap`** 中，结构是 `WeakMap<对象, Map<属性, Dep>>`。
->
-> 数组不需要重写方法，因为 `Proxy` 能直接拦截索引和长度的修改。
+## 2. Vue 3 为什么用 Proxy 替代 Object.defineProperty？
 
-**依赖收集**：渲染 `effect` 执行渲染函数时**访问数据会触发 `get` 拦截器**，`get` 把当前 effect 加入该属性的 Dep 中。
+`Object.defineProperty` 有两个主要缺陷：
 
-> 每个组件实例对应一个**渲染 effect**，它负责组件的渲染。
->
-> 依赖收集和更新由 **`effect`** 负责，它相当于 Vue 2 的 watcher。
->
-> effect（泛指）
->   ├─ 渲染 effect       ← 每个组件一个，负责渲染
->   ├─ 计算 effect       ← computed 用
->   └─ 用户 effect       ← watch 用
+1. **初始化性能差**：Vue 2 在初始化时必须**递归遍历**所有属性，数据量大时开销明显。
+2. **只能劫持已存在的属性**：以下操作都检测不到：
+   - 给对象**新增或删除属性**（`obj.newKey = 1`、`delete obj.key`）
+   - 通过**下标修改数组**（`arr[0] = 1`）
+   - 修改**数组长度**（`arr.length = 0`）
 
-**派发更新**：当数据被修改时，触发 **`set` 拦截器**，`set` 调用 `trigger`，通知 Dep 里所有 effect 执行 `update()`。`update()` 会把更新推入异步队列，在 `nextTick` 里批量执行，最终重新渲染组件。
+   Vue 2 虽然重写了 `push`、`pop` 等 7 个数组方法，但下标和长度的修改仍然检测不到，只能改用 `Vue.set` 或 `splice`。
 
+Vue 3 改用 `Proxy` 后，这两个问题都解决了：
 
+1. **惰性代理**：代理整个对象，访问到嵌套对象时才创建代理，不必在初始化时递归遍历。
+2. **拦截任意操作**：新增、删除属性，修改数组下标和长度，都能被监听到。
 
-## 2. Vue3为什么从 Object.defineProperty() 换成Proxy？
+## 3. computed 和 watch 的区别
 
-主要两个原因：
+### computed（计算属性）
 
-1. `Object.defineProperty` **性能较差**：Vue 2 **初始化时**必须**递归遍历**所有属性
+- **用途**：根据已有数据计算出一个新值。
+- **有缓存**：只有依赖的响应式数据变化时才重新计算，依赖不变时直接复用上次结果。计算发生在“被读取时”。
+- **不支持异步**：值必须同步返回。如果写成 `async`，得到的是 Promise 而不是计算结果。
 
-2. `Object.defineProperty` **只能劫持已经存在的属性**
+**适用场景**：由其他数据推导出来的值，比如总价、过滤后的列表。
 
-   
+### watch（侦听器）
 
-对象新增，删除属性，以及通过索引修改数组元素，改length无法检测到例如：
+- **用途**：监听某个数据的变化，并在变化时执行操作。
+- **无缓存、无返回值**：只要被监听的数据变化，回调就会执行。回调接收新值和旧值两个参数。
+- **支持异步**：可以在回调中发请求、读写本地存储或执行其他副作用。
+- **常用选项**：`immediate` 表示创建时立即执行一次回调；`deep` 表示深度监听对象或数组内部的变化。
 
-- 通过**下标修改数组**（`arr[0] = 1`）
-- 修改**数组长度**（`arr.length = 0`）
-- 给对象**新增属性**（`obj.newKey = 1`）
+**适用场景**：数据变化后需要执行动作，比如搜索时发请求、自动保存草稿。
 
-虽然 Vue 2 对数组的 `push`、`pop` 等 7 个方法做了重写，但下标修改和长度修改仍然检测不到，需要用 `Vue.set` 或 `splice`。
+### 对比
 
-Vue 3 改用 `Proxy`解决了以上问题 : 
+| 对比项 | computed | watch |
+| --- | --- | --- |
+| 作用 | 计算出新值 | 数据变化后执行操作 |
+| 缓存 | 有 | 无 |
+| 异步 | 不支持 | 支持 |
+| 返回值 | 有 | 无 |
 
-1. 代理整个对象，**惰性创建**，访问到嵌套对象才代理，不用初始化时递归遍历
-2. `Proxy` 能拦截**任何方式**的属性操作——新增、删除、数组下标、长度修改，都能监听到。
+## 4. slot 插槽是什么？有什么作用？
 
+slot（插槽）是 Vue 的**内容分发机制**。子组件用 `<slot>` 作为占位出口，**插入什么内容、怎么显示由父组件决定**。
 
+插槽分三类：
 
-## 3. Computed 和 Watch 的区别
-
-**Computed（计算属性）** 
-
-- 用于根据已有数据计算出一个新值，它的值必须通过同步返回，因此**不支持异步操作**——如果写成 `async`，返回的是 Promise 而不是计算后的值。
-
-- **有缓存机制**，只有当依赖的响应式数据发生变化时才会重新计算，依赖不变时直接复用上次的结果，避免重复计算。它的执行时机是“被读取时”。
-
-Computed 适用于由其他数据推导出来的值，比如总价、过滤后的列表等场景。
-
-**Watch（侦听器）** 
-
-- 用于监听某个数据的变化，并在变化时执行相应的操作，它本身**没有返回值**，也**不具备缓存机制**，**只要被监听的数据发生变化，回调就会执行**。
-
-- **支持异步**操作，可以在回调中发起请求、读写本地存储或执行其他副作用。它的回调接收两个参数：新值和旧值。
-
-  > Watch 还支持两个常用选项：`immediate` 表示组件加载时立即执行一次回调，`deep` 表示深度监听对象或数组内部的变化。
-
-Watch 适用于数据变化后需要执行动作的场景，比如搜索时发请求、自动保存草稿等。
-
-
-
-## 4. slot是什么？有什么作用？
-
-slot 又名插槽，是 Vue 的**内容分发机制**。子组件用 `<slot>` 作为占位出口，**是否显示、怎么显示由亲组件决定**。
-
-slot 分三类：
-
-- **默认插槽**：不指定 `name`，通常只写一个。
+- **默认插槽**：不指定 `name`，一个组件通常只有一个。
 - **具名插槽**：带 `name` 属性，一个组件可以有多个。
-- **作用域插槽**：默认/具名插槽的变体。子组件渲染时，**把内部数据传给亲组件，亲组件根据这些数据决定如何渲染**。
+- **作用域插槽**：默认插槽或具名插槽的变体。子组件渲染时**把内部数据传给父组件，父组件根据这些数据决定如何渲染**。
 
+## 5. 如何保存页面状态？
 
+保存页面状态（即组件状态）分两种情况：组件**会被卸载**，或组件**不会被卸载**。
 
-## 5. 如何保存页面的当前的状态
+### 情况一：组件会被卸载
 
-要保持页面的状态（也就是组件的状态），会出现以下两种情况：
+#### 方法 1：存入 localStorage / sessionStorage
 
-* 组件会被卸载
-* 组件不会被卸载
+在组件卸载前的钩子里（Vue 2 的 `beforeDestroy`、Vue 3 的 `beforeUnmount`、React 的 `componentWillUnmount`），用 `JSON.stringify()` 把组件状态存进 Storage，重新进入时再读出来。
 
-那么可以按照这两种情况分别得到以下方法：
+- **优点**：兼容性好，不需要额外的库，简单快捷，能满足大部分需求。
+- **缺点**：经过 JSON 序列化后，`Date`、`RegExp` 会丢失类型，`undefined`、函数、`Symbol` 会丢失，循环引用会直接报错。
 
-### **组件会被卸载：**
+#### 方法 2：路由传参
 
-#### **（1）将状态存储在localStorage / sessionStorage**
+跳转路由时携带参数来传递状态，常用两种方式：
 
-在组件卸载前的钩子里（Vue 2 `beforeDestroy` / Vue 3 `beforeUnmount` / React `componentWillUnmount`），把组件状态通过 `JSON.stringify()` 存进 Storage。
+- **`query` 传参**：如 `this.$router.push({ query: { page: 2 } })`。参数显示在 URL 中，刷新不丢失，目标组件通过 `$route.query` 读取。
+- **`state` 隐式传参**（Vue Router 4）：如 `this.$router.push({ state: { scrollTop: 500 } })`。参数保存在浏览器原生的 `history.state` 中，不出现在 URL 里，刷新不丢失，还能传递 `Date` 等复杂对象（不经过 JSON 序列化）。目标组件通过 `history.state` 读取。
 
-**优点**
+- **优点**：简单快捷，不占用 localStorage / sessionStorage；可以传递 `Date`、`RegExp` 等特殊对象。
+- **缺点**：如果 A 组件能跳转到多个组件，每个跳转处都要写传参逻辑，维护成本较高。
 
-* 兼容性好，不需要额外库。简单快捷，基本可以满足大部分需求。
+### 情况二：组件不会被卸载
 
-**缺点**
+#### 方法：使用 keep-alive 缓存组件
 
-- JSON 方法序列化后，`Date`、`RegExp` 等会丢失类型，`undefined`、函数、`Symbol` 会丢失，循环引用会报错。
-
-#### **（2）路由传值**
-
-通过路由跳转时携带参数来实现状态传递。常用方式有两种：
-
-- **通过 `query` 传参**：如 `this.$router.push({ query: { page: 2 } })`。状态会暴露在 URL 中，刷新不丢失。目标组件通过 `$route.query` 读取。
-- **通过 `state` 隐式传参**：如 `this.$router.push({ state: { scrollTop: 500 } })`。参数通过浏览器原生的 `history.state` 保存，不会出现在 URL 中，而且刷新不丢失，适合传递复杂对象（如 `Date` 对象，不受 JSON 序列化影响）。目标组件通过 `history.state` 读取。
-
-**优点**
-
-* 简单快捷，不会污染 LocalStorage / SessionStorage。
-* 可以传递 Date、RegExp 等特殊对象
-
-**缺点**
-
-* 如果 A 组件可以跳转至多个组件，需要在每个跳转的地方都写相应的传参逻辑，维护成本较高。
-
-### **组件不会被卸载：**
-
-#### （1）keep-alive
-
-在Vue中，可以用**keep-alive**来缓存页面，当组件在keep-alive内被切换时组件的**activated、deactivated**这两个生命周期钩子函数会被执行，被包裹在keep-alive中的组件的状态将会被保留：
+用 `<keep-alive>` 包裹的组件在切换时不会被销毁，状态会被保留，同时会触发 `activated` 和 `deactivated` 两个生命周期钩子（详见第 7 节）。
 
 ```vue
- <!--cachedViews为存储需要缓存的组件名的数组-->
-<keep-alive :include="cachedViews">   
+<!-- cachedViews：需要缓存的组件名数组 -->
+<keep-alive :include="cachedViews">
   <router-view></router-view>
 </keep-alive>
 ```
 
-**router.js**
+也可以在路由配置里用 `meta` 标记哪些页面需要缓存，再据此生成 `cachedViews`：
 
 ```javascript
+// router.js
 {
   path: '/',
   name: 'xxx',
-  component: ()=>import('../src/views/xxx.vue'),
-  meta:{
+  component: () => import('../src/views/xxx.vue'),
+  meta: {
     keepAlive: true // 需要被缓存
   }
-},
+}
 ```
 
+## 6. v-if 和 v-show 的区别
 
+| 对比项 | `v-if`（条件渲染） | `v-show`（样式显隐） |
+| --- | --- | --- |
+| 渲染方式 | 惰性渲染：编译为三元表达式，条件为假时不生成真实 DOM | 全量渲染：无论条件真假都生成 DOM，并一直保留在页面中 |
+| 切换方式 | 动态增删 DOM 节点 | 只修改内联样式 `display` |
+| 子组件生命周期 | 切换时**完整销毁并重建** | **不触发** |
+| 性能开销 | **切换开销高** | **初始渲染开销高** |
+| 适用场景 | 条件**很少改变**、权限控制 | **频繁切换**显隐 |
 
-## 7. v-if和v-show的区别
+## 7. keep-alive 是什么？怎么用？
 
+### 作用与缓存内容
 
-- **`v-if`（条件渲染）：** 惰性渲染。编译为三元表达式，条件为假时不生成真实 DOM。切换时会动态增删 DOM 节点，并**触发内部子组件完整的销毁与重建生命周期**。
+- **作用**：包裹动态组件 `<component :is="...">` 或路由视图 `<router-view>`，在组件切换时保留状态，避免重复创建和销毁的开销。
+- **缓存内容**：缓存的是**组件实例**（包括响应式状态、VNode 和已渲染的真实 DOM 引用）。切走时 DOM 只是从页面移除并暂存，并没有真正销毁。
 
-- **`v-show`（样式显隐）：** 全量渲染。无论条件真假都会生成真实 DOM 并始终保留在页面中，仅仅通过修改元素内联样式 `display` 控制显隐，**不触发子组件生命周期**。
+### 常用属性
 
-- **性能与场景：** `v-if` **切换开销高**，适合运行时条件**很少改变**或权限控制场景；`v-show` **初始渲染开销高**，适合**频繁切换**显隐的场景。
+- **`include` / `exclude`**：字符串、正则或数组，匹配组件的 `name` 决定是否缓存，`exclude` 优先级更高。
+- **`max`**：数字，最多缓存的实例数。超出上限时采用 **LRU（最近最少使用）策略**，销毁最久未访问的实例。
 
+### 原理与生命周期
 
-## 8. keep-alive？
+- **原理**：`<keep-alive>` 本身是**抽象组件**，不渲染真实 DOM。切回已缓存的组件时，直接复用缓存的实例和 DOM 插入页面，跳过重新创建。
+- **生命周期**：
+  - 首次进入：`created` → `mounted` → `activated`
+  - 切走：触发 **`deactivated`**，不会触发卸载
+  - 再次切回：只触发 **`activated`**
 
-
-**1. 作用与缓存内容**
-
-* **作用：** 包裹动态组件`<component :is="...">`或路由视图`<router-view>`，在组件切换时保留状态，避免重复渲染与销毁的开销。
-* **缓存对象：** 缓存的是**组件实例**（包含响应式状态数据、VNode 及已渲染的真实 DOM 引用）。切走时 DOM 仅从页面移除并暂存，并未真正销毁。
-
-**2. 三个核心属性**
-
-* **`include` / `exclude`：** 字符串、正则或数组，匹配组件 `name` 决定是否缓存（`exclude` 优先级更高）。
-* **`max`：** 数字，最大缓存实例数。超出上限时采用 **LRU（最近最少使用）策略**，自动淘汰并销毁最久未访问的组件实例。
-
-**3. 底层机制与生命周期**
-
-* **原理：** 自身是**抽象组件**（不渲染真实 DOM）。再次切回命中缓存的组件时，直接复用缓存的实例和 DOM 插入页面，跳过重新创建过程。
-* **生命周期：** 首次进入触发 `created` → `mounted` → `activated`；切走触发 **`deactivated`**（不触发卸载）；再次切回仅触发 **`activated`**。
-
-**4. 代码示例（Vue 3 路由缓存）**
+### 代码示例（Vue 3 路由缓存）
 
 ```vue
 <template>
   <router-view v-slot="{ Component }">
-    <!-- 最多缓存 5 个组件，仅缓存名为 Home 和 List 的组件 -->
+    <!-- 最多缓存 5 个组件，只缓存名为 Home 和 List 的组件 -->
     <keep-alive :include="['Home', 'List']" :max="5">
       <component :is="Component" />
     </keep-alive>
   </router-view>
 </template>
-
 ```
 
-> **注意：** 
-> 1. 组件必须显式声明 `name` 属性，`include` 才能生效。
-> 2. `<keep-alive>` 必须作为直接父级包裹动态组件 `<component>`。因此需要通过 `<router-view>` 的作用域插槽（`v-slot`）将当前路由匹配的页面组件实例（`Component`）暴露出来，再显式交给 `<keep-alive>` 包裹的 `<component :is="Component" />` 进行动态渲染与缓存管理。
+::: warning 注意
+1. 组件必须显式声明 `name`，`include` 才能生效。
+2. `<keep-alive>` 必须直接包裹动态组件 `<component>`。所以要通过 `<router-view>` 的作用域插槽（`v-slot`）拿到当前路由对应的组件（`Component`），再交给 `<keep-alive>` 内的 `<component :is="Component" />` 渲染和缓存。
+:::
 
-## 9. $nextTick 原理及作用
+## 8. nextTick 的作用与原理
 
-**（1） 引入原因与核心作用**
+### 为什么需要 nextTick
 
-- **引入原因（异步更新队列）：** 
-  Vue 更新 DOM 是**异步**的。当响应式数据发生多次连续修改时，Vue 不会每次修改都立刻同步重新渲染 DOM，而是将同一事件循环（Tick）内的所有数据变更缓冲到一个异步更新队列中并去重，等本轮同步代码执行完毕后，再批量执行一次虚拟 DOM 比对与真实 DOM 更新，从而避免重复渲染带来的性能浪费。
+Vue **异步更新 DOM**。数据连续修改多次时，Vue 不会每次都立刻重新渲染，而是把同一事件循环（Tick）内的所有变更放进一个异步更新队列并去重，等本轮同步代码执行完，再统一做一次虚拟 DOM 比对和真实 DOM 更新，避免重复渲染。
 
-- **核心作用：** `nextTick` 用于在**下次 DOM 更新循环结束之后**执行延迟回调（即把本来应该现在执行的内容延迟到更新完DOM后执行）。当**修改了响应式数据**，且紧接着**需要获取更新后的最新 DOM 状态**时，必须使用 `nextTick`。
-    
+因此修改数据后立刻读取 DOM，拿到的还是旧内容。
 
-**（2） 底层实现原理（Vue 3 vs Vue 2）**
+### 作用
 
-- **本质：** 对 JS 事件循环 微任务队列 ”先进先出“ 机制的应用。
-  修改数据时，Vue 会先向浏览器的微任务队列推入“批量更新 DOM”的任务；紧接着调用 `nextTick` 时，会向同一个微任务队列推入“回调函数”。利用微任务先进先出的特性，确保回调一定在 DOM 更新完成之后执行。
-    
-- **Vue 3 实现：** **直接基于原生微任务 `Promise.resolve().then()` 实现**，返回一个 `Promise` 对象（因此支持 `async/await` 写法）。
+`nextTick` 用于在**下一次 DOM 更新结束后**执行回调，即把本来要立刻执行的代码推迟到 DOM 更新之后。**修改了响应式数据，并且紧接着需要读取更新后的 DOM** 时，就要使用 `nextTick`。
 
+### 原理
 
-**（3） 代码示例（Vue 3）**
+- **本质**：利用 JS 事件循环中微任务队列“先进先出”的特性。修改数据时，Vue 先向微任务队列推入“批量更新 DOM”的任务；随后调用 `nextTick`，回调被推入同一个队列的后面。按先进先出的顺序，回调一定在 DOM 更新之后执行。
+- **Vue 3 实现**：直接基于原生微任务 `Promise.resolve().then()`，并返回一个 `Promise`，因此可以用 `await nextTick()`。
 
+### 代码示例（Vue 3）
 
-```JavaScript
+```vue
 <template>
   <div class="demo-box">
     <!-- ref="msgRef" 绑定真实 DOM；{{ message }} 渲染响应式文本 -->
@@ -256,133 +228,82 @@ const message = ref('初始短文本')
 const msgRef = ref(null)
 
 const updateMessage = async () => {
-  // 1. 修改数据（内存立即变化，但真实 DOM 尚未更新）
+  // 1. 修改数据（数据立即变化，但真实 DOM 尚未更新）
   message.value = '修改后的超长多行文本内容！'
   console.log('更新前 DOM 文本：', msgRef.value.textContent) // '初始短文本'
 
   // 2. 等待本轮 DOM 异步更新完成
   await nextTick()
 
-  // 3. 安全获取更新后的最新 DOM 状态
+  // 3. 拿到更新后的 DOM
   console.log('更新后 DOM 文本：', msgRef.value.textContent) // '修改后的超长多行文本内容！'
 }
 </script>
 ```
 
-> **注意：** **首次页面渲染完成后的初始 DOM 操作**，应直接放在 **`onMounted`（或 `mounted`）** 中执行；`nextTick` 主要用于**数据响应式变化后的 DOM 刷新时机**。
+::: tip 提示
+页面**首次渲染完成后**的 DOM 操作，直接放在 `onMounted`（或 `mounted`）里即可；`nextTick` 主要用于**数据变化后**等待 DOM 刷新。
+:::
 
+## 9. 给响应式对象添加新属性，视图会更新吗？
 
-## **19. Vue 中给 data 中的对象属性添加一个新的属性时会发生什么？如何解决？**
+### Vue 3：会自动更新
 
-  ```javascript
-  <template> 
-     <div>
-        <ul>
-           <li v-for="value in obj" :key="value"> {{value}} </li> 
-        </ul> 
-        <button @click="addObjB">添加 obj.b</button> 
-     </div>
-  </template>
+直接赋值 `obj.b = 'obj.b'`，数据变了，页面也会**自动更新**。
+
+**原因**：Vue 3 用 **`Proxy`** 代理**整个对象**，能直接拦截属性的新增和删除，因此也不再需要 `$set`（Vue 3 已移除该方法）。
+
+### Vue 2：数据变了，视图不更新
+
+直接赋值 `this.obj.b = 'obj.b'`，控制台能看到新属性，但页面**不会更新**。
+
+**原因**：Vue 2 用 **`Object.defineProperty`**，只能在初始化时逐个劫持**已存在**的属性，监听不到之后新增的属性。
+
+**解决办法**：
+
+1. **`this.$set(this.obj, 'b', 'obj.b')`**：把新属性变成响应式并触发更新。
+2. **替换整个对象**（适合一次新增多个属性）：`this.obj = { ...this.obj, b: 'obj.b' }`，通过给 `obj` 重新赋值触发更新。
+
+## 10. Vue 2 如何监听数组变化？
+
+### 重写了哪 7 个方法
+
+Vue 2 只重写了会**直接修改原数组**的 7 个方法：`push`、`pop`、`shift`、`unshift`、`splice`、`sort`、`reverse`。
+
+像 `filter`、`slice` 这类返回新数组的方法，用新数组替换旧数组即可触发更新。
+
+### 实现方式
+
+出于性能考虑，Vue 2 没有逐个劫持数组下标，而是做了一层**原型拦截**：
+
+1. 新建一个继承自 `Array.prototype` 的中间对象，把这 7 个方法重写后挂在上面。
+2. 让响应式数组的原型指向这个中间对象。
+3. 调用这些方法时，依次执行：**先执行原生方法修改数组 → 如果有新增元素，把新元素也变成响应式 → 调用 `ob.dep.notify()` 通知视图更新**。
+
+### Vue 3 的变化
+
+Vue 3 不再重写数组方法。它用 **`Proxy`** 代理整个数组，无论是下标修改（`arr[0] = 1`）、修改长度，还是调用任何数组方法，都能被直接拦截并自动更新页面。
+
+## 11. Vue 单页应用与多页应用的区别
+
+**核心概念**
+
+- **SPA（单页应用）：** 只有一个主 HTML 页面，所有功能模块拆分为组件。页面跳转通过前端路由（`hash` 或 `history` 模式）动态切换组件，只做**局部更新**，不重新加载整个页面。
+    
+- **MPA（多页应用）：** 由多个独立的完整 HTML 页面组成。每次跳转都会向服务器请求新的 HTML，触发**整页刷新**并重新加载公共资源。
+    
+
+**核心区别对比**
+
+| **对比维度**        | **SPA（单页应用）**                                         | **MPA（多页应用）**                                      |
+| --------------- | ----------------------------------------------------- | -------------------------------------------------- |
+| **页面切换与体验**     | 前端路由局部切换，**无白屏、切换极快**，易实现平滑过渡动画                       | 整页刷新重新请求资源，**切换较慢**，弱网下易白屏闪烁                       |
+| **首屏加载速度**      | **较慢**（需先加载核心框架与首屏 JS 后才能渲染，需做路由懒加载等优化）               | **较快**（单页体积小，浏览器直接解析服务端返回的 HTML）                   |
+| **SEO（搜索引擎优化）** | **不友好**（内容靠 JS 动态生成，爬虫难抓取；需借助 **SSR 服务端渲染**如 Nuxt 解决） | **天生友好**（每个页面都有独立完整的 HTML 内容与 Meta 标签）             |
+| **数据传递与状态**     | 内存共享全局状态（如 **Pinia / Vuex**、路由传参），跨页通信极方便             | 页面刷新内存清空，必须依赖 **URL 参数、Cookie、LocalStorage** 或后端接口 |
+| **适用场景**        | 强交互、重体验的中后台管理系统、Web App                               | 注重 SEO 流量与内容展示的官网、资讯门户、电商首页                        |
+
   
-  <script>
-      export default { 
-         data () { 
-            return { 
-                obj: { 
-                    a: 'obj.a' 
-                } 
-            } 
-         },
-         methods: { 
-            addObjB () { 
-                this.obj.b = 'obj.b' 
-                console.log(this.obj) 
-            } 
-        }
-     }
-  </script>
-  ```
-
-  点击 button 会发现，obj.b 已经成功添加，但是视图并未刷新。这是因为在Vue实例创建时，obj.b并未声明，因此就没有被Vue转换为响应式的属性，自然就不会触发视图的更新，这时就需要使用Vue的全局 api **$set()：**
-
-  ```javascript
-  addObjB () (
-     this.$set(this.obj, 'b', 'obj.b')
-     console.log(this.obj)
-  }
-  ```
-
-  $set()方法相当于手动的去把obj.b处理成一个响应式的属性，此时视图也会跟着改变了。
-
-  ## 20. Vue中封装的数组方法有哪些，其如何实现页面更新
-
-  在Vue中，对响应式处理利用的是Object.defineProperty对数据进行拦截，而这个方法并不能监听到数组内部变化，数组长度变化，数组的截取变化等，所以需要对这些操作进行hack，让Vue能监听到其中的变化。
-
-  ![1604019269329-d88e91cf-b33d-4b2d-b014-e5739e9b7dbc.png](../public/images/js/1604019269329-d88e91cf-b33d-4b2d-b014-e5739e9b7dbc-322899.png)
-
-  那Vue是如何实现让这些数组方法实现元素的实时更新的呢，下面是Vue中对这些方法的封装：
-
-  ```javascript
-  // 缓存数组原型
-  const arrayProto = Array.prototype;
-  // 实现 arrayMethods.__proto__ === Array.prototype
-  export const arrayMethods = Object.create(arrayProto);
-  // 需要进行功能拓展的方法
-  const methodsToPatch = [
-    "push",
-    "pop",
-    "shift",
-    "unshift",
-    "splice",
-    "sort",
-    "reverse"
-  ];
-  
-  /**
-   * Intercept mutating methods and emit events
-   */
-  methodsToPatch.forEach(function(method) {
-    // 缓存原生数组方法
-    const original = arrayProto[method];
-    def(arrayMethods, method, function mutator(...args) {
-      // 执行并缓存原生数组功能
-      const result = original.apply(this, args);
-      // 响应式处理
-      const ob = this.__ob__;
-      let inserted;
-      switch (method) {
-      // push、unshift会新增索引，所以要手动observer
-        case "push":
-        case "unshift":
-          inserted = args;
-          break;
-        // splice方法，如果传入了第三个参数，也会有索引加入，也要手动observer。
-        case "splice":
-          inserted = args.slice(2);
-          break;
-      }
-      // 
-      if (inserted) ob.observeArray(inserted);// 获取插入的值，并设置响应式监听
-      // notify change
-      ob.dep.notify();// 通知依赖更新
-      // 返回原生数组方法的执行结果
-      return result;
-    });
-  });
-  ```
-
-  简单来说就是，重写了数组中的那些原生方法，首先获取到这个数组的\_\_ob\_\_，也就是它的Observer对象，如果有新的值，就调用observeArray继续对新的值观察变化（也就是通过`target__proto__ == arrayMethods`来改变了数组实例的型），然后手动调用notify，通知渲染watcher，执行update。
-
-  ## 21. Vue 单页应用与多页应用的区别
-
-  **概念：**
-
-  * SPA单页面应用（SinglePage Web Application），指只有一个主页面的应用，一开始只需要加载一次js、css等相关资源。所有内容都包含在主页面，对每一个功能模块组件化。单页应用跳转，就是切换相关组件，仅仅刷新局部资源。
-  * MPA多页面应用 （MultiPage Application），指有多个独立页面的应用，每个页面必须重复加载js、css等相关资源。多页应用跳转，需要整页资源刷新。
-
-  **区别：**
-
-  ![1609521413572-54d0bd0f-8ed6-4438-997a-c890e4cd9c5e.jpeg](../public/images/js/1609521413572-54d0bd0f-8ed6-4438-997a-c890e4cd9c5e-749068.jpeg)
 
   ## 22. Vue template 到 render 的过程
 
